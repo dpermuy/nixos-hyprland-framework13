@@ -67,7 +67,7 @@ services.displayManager = {
   hardware.opengl = {
     enable = true;
     driSupport = true;
-    driSupport32Bit = true;  # For Steam 32-bit games
+    driSupport32Bit = pkgs.stdenv.hostPlatform.isx86_64;  # For Steam 32-bit games
   };
 
   # Enable Steam hardware
@@ -86,4 +86,9 @@ services.displayManager = {
 
   # Enable CUPS for printing
   services.printing.enable = true;
+
+  # fix SSDM config 
+  services.xserver.enable = true;
+  services.displayManager.sddm.wayland.enable = true;
+
 }

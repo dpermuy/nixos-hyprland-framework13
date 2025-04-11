@@ -10,10 +10,10 @@
   };
 
   # Graphics drivers for AMD
-  hardware.opengl = {
-    enable = true;
-    driSupport = true;
-    driSupport32Bit = true;
+ hardware.opengl = {
+   enable = true;
+    # driSupport = true;
+    # driSupport32Bit = true;
     extraPackages = with pkgs; [
       amdvlk
       rocm-opencl-icd
