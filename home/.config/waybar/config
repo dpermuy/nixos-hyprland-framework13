@@ -1,0 +1,48 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 30,
+    "modules-left": ["hyprland/workspaces"],
+    "modules-center": ["clock"],
+    "modules-right": ["pulseaudio", "cpu", "memory", "battery", "tray"],
+    
+    "hyprland/workspaces": {
+        "format": "{name}",
+        "on-click": "activate"
+    },
+    
+    "clock": {
+        "format": "{:%a, %b %d %H:%M}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+    
+    "cpu": {
+        "format": "CPU {usage}%",
+        "interval": 1
+    },
+    
+    "memory": {
+        "format": "MEM {}%",
+        "interval": 1
+    },
+    
+    "battery": {
+        "format": "BAT {capacity}%",
+        "format-charging": "CHG {capacity}%",
+        "states": {
+            "warning": 30,
+            "critical": 15
+        }
+    },
+    
+    "pulseaudio": {
+        "format": "VOL {volume}%",
+        "format-muted": "MUTED",
+        "on-click": "pavucontrol"
+    },
+    
+    "tray": {
+        "icon-size": 18,
+        "spacing": 10
+    }
+}
