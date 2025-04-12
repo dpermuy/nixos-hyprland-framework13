@@ -4,20 +4,22 @@
 { config, lib, pkgs, modulesPath, ... }:
 
 {
-  imports = [ ];
+  imports =
+    [ (modulesPath + "/installer/scan/not-detected.nix")
+    ];
 
-  boot.initrd.availableKernelModules = [ "xhci_pci" "sr_mod" ];
+  boot.initrd.availableKernelModules = [ "nvme" "xhci_pci" "thunderbolt" "usb_storage" "sd_mod" ];
   boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ ];
+  boot.kernelModules = [ "kvm-amd" ];
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
-    { device = "/dev/disk/by-uuid/a94c49ad-9777-45f8-acac-54c55e3fbfe4";
+    { device = "/dev/disk/by-uuid/b3035a9b-60a7-46ad-8a7f-fab43fe020ee";
       fsType = "ext4";
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/E32A-C3AF";
+    { device = "/dev/disk/by-uuid/1FF4-74AD";
       fsType = "vfat";
       options = [ "fmask=0077" "dmask=0077" ];
     };
@@ -29,9 +31,8 @@
   # still possible to use this option, but it's recommended to use it in conjunction
   # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
   networking.useDHCP = lib.mkDefault true;
-  # networking.interfaces.enp0s5.useDHCP = lib.mkDefault true;
+  # networking.interfaces.wlp1s0.useDHCP = lib.mkDefault true;
 
-  nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
-  hardware.parallels.enable = true;
-  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "prl-tools" ];
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+  hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }
