@@ -2,7 +2,6 @@
 
 This is my NixOS config for the Framework 13,  AMD Ryzen 5 7640U.
 
-cowsay now with 1.17x scaling
  ________________________
 < now with 1.17x scaling >
  ------------------------
