@@ -201,6 +201,7 @@ nixpkgs.overlays = [
     lolcat
     tuir
     bibata-cursors
+    kew
 
     # SDDM Theme - You can keep this for the sugar-dark theme as backup
     (pkgs.fetchFromGitHub {
