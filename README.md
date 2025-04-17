@@ -1,10 +1,8 @@
 # NixOS built for Framework 13 AMD
 
-This is my NixOS config for the Framework 13,  AMD Ryzen 5 7640U.
-
-cowsay now with 1.17x scaling
+This is my NixOS config for the Framework 13, AMD Ryzen 5 7640U
  ________________________
-< now with 1.17x scaling >
+< now with 1.175x scaling >
  ------------------------
         \   ^__^
          \  (oo)\_______
@@ -34,5 +32,4 @@ cowsay now with 1.17x scaling
 - Waybar (status bar)
 - Wofi (application launcher)
 - lf (file browser)
-- Steam
-- Cider (for apple music)
+- MineSDDM login theme
