@@ -1,6 +1,8 @@
 # NixOS built for Framework 13 AMD
 
 This is my NixOS config for the Framework 13, AMD Ryzen 5 7640U
+
+**There are many things that still need to be fixed. Nothing is exactly broken, but it is still a work in progress.**
  ________________________
 < now with 1.175x scaling >
  ------------------------
