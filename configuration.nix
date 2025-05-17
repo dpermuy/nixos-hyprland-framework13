@@ -204,8 +204,8 @@ in
     driSupport32Bit = true;
     extraPackages = with pkgs; [
       amdvlk
-      rocm-opencl-icd
-      rocm-opencl-runtime
+      rocmPackages.clr      # This is the ROCm OpenCL runtime
+      rocmPackages.rocm-opencl-icd  # Try this if available
     ];
   };
   
