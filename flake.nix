@@ -26,7 +26,7 @@
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
-          home-manager.users.dylan = import ./home.nix;
+          home-manager.users.dylan = import ./modules/home.nix;
           home-manager.extraSpecialArgs = {
             inherit hyprland;
           };
