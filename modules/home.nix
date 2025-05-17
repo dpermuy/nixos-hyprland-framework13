@@ -10,82 +10,97 @@
   
   # HYPRLAND CONFIGURATION
   wayland.windowManager.hyprland = {
-    enable = true;
-    package = hyprland.packages.${pkgs.system}.hyprland;
-    systemd.enable = true;
+  enable = true;
+  package = hyprland.packages.${pkgs.system}.hyprland;
+  systemd.enable = true;
+  
+  extraConfig = ''
+    # Monitor configuration for Framework 13 (3:2 aspect ratio)
+    monitor=eDP-1,preferred,auto,1.566667
     
-    extraConfig = ''
-      # Monitor configuration with proper scaling
-      monitor=,preferred,auto,1.5
+    # XWayland scaling
+    xwayland {
+      force_zero_scaling = true
+    }
+    
+    # Input configuration
+    input {
+      kb_layout = us
+      follow_mouse = 1
+      sensitivity = 0
+      accel_profile = flat
       
-      # XWayland scaling
-      xwayland {
-        force_zero_scaling = true
+      touchpad {
+        natural_scroll = true
+        disable_while_typing = true
+        tap-to-click = false
+        clickfinger_behavior = true
       }
-      
-      # Input configuration
-      input {
-        kb_layout = us
-        follow_mouse = 1
-        sensitivity = 0
-        accel_profile = flat
-        
-        touchpad {
-          natural_scroll = true
-          disable_while_typing = true
-          tap-to-click = false
-          clickfinger_behavior = true
-        }
-      }
-      
-      # General appearance
-      general {
-        gaps_in = 5
-        gaps_out = 10
-        border_size = 2
-        col.active_border = rgb(bd93f9) rgb(ff79c6) 45deg
-        col.inactive_border = rgb(44475a)
-        layout = dwindle
-      }
-      
-      # Decoration settings
-      decoration {
-        rounding = 10
-        blur {
-          enabled = true
-          size = 3
-          passes = 1
-          new_optimizations = true
-        }
-      }
-      
-      # Animation settings - fine-tuned
-      animations {
+    }
+    
+    # General appearance
+    general {
+      gaps_in = 5
+      gaps_out = 10
+      border_size = 2
+      col.active_border = rgb(bd93f9) rgb(ff79c6) 45deg
+      col.inactive_border = rgb(44475a)
+      layout = dwindle
+      cursor_inactive_timeout = 4
+      no_cursor_warps = false
+    }
+    
+    # Decoration settings
+    decoration {
+      rounding = 10
+      blur {
         enabled = true
-        bezier = myBezier, 0.05, 0.9, 0.1, 1.05
-        animation = windows, 1, 7, myBezier
-        animation = windowsOut, 1, 7, default, popin 80%
-        animation = border, 1, 10, default
-        animation = fade, 1, 7, default
-        animation = workspaces, 1, 6, default
+        size = 3
+        passes = 1
+        new_optimizations = true
+        xray = false
       }
-      
-      # Layout settings
-      dwindle {
-        pseudotile = true
-        preserve_split = true
-        no_gaps_when_only = false
-      }
-      
-      # Autostart applications
-      exec-once = waybar
-      exec-once = hyprpaper
-      exec-once = swaync
-      # Network management
-      exec-once = nm-applet --indicator
-      exec-once = blueman-applet
-      # Add cursor size settings
-      exec-once = hyprctl setcursor Nordzy-cursors 32
+      drop_shadow = true
+      shadow_range = 8
+      shadow_render_power = 2
+      shadow_ignore_window = true
+      col.shadow = rgba(00000044)
+    }
+    
+    # Animation settings
+    animations {
+      enabled = true
+      bezier = myBezier, 0.05, 0.9, 0.1, 1.05
+      animation = windows, 1, 7, myBezier
+      animation = windowsOut, 1, 7, default, popin 80%
+      animation = border, 1, 10, default
+      animation = fade, 1, 7, default
+      animation = workspaces, 1, 6, default
+    }
+    
+    # Layout settings
+    dwindle {
+      pseudotile = true
+      preserve_split = true
+      no_gaps_when_only = false
+    }
+    
+    # Miscellaneous
+    misc {
+      disable_hyprland_logo = true
+      disable_splash_rendering = true
+      mouse_move_enables_dpms = true
+      key_press_enables_dpms = true
+      animate_manual_resizes = true
+    }
+    
+    # Autostart applications
+    exec-once = waybar
+    exec-once = hyprpaper
+    exec-once = swaync
+    exec-once = nm-applet --indicator
+    exec-once = blueman-applet
+    exec-once = hyprctl setcursor Nordzy-cursors 32
       
       # Key bindings - Mostly keeping your existing ones
       bind = SUPER, Return, exec, kitty
@@ -155,10 +170,15 @@
       windowrule = size 60% 60%, title:^(Picture-in-Picture)$
       windowrule = move 39% 39%, title:^(Picture-in-Picture)$
       
-      # Environment variables for apps
-      env = GDK_SCALE,1.5
-      env = GDK_DPI_SCALE,0.75
-      env = XCURSOR_SIZE,32
+      # Environment variables adjusted for Framework display
+    env = XCURSOR_THEME,Nordzy-cursors
+    env = XCURSOR_SIZE,32
+    env = WLR_NO_HARDWARE_CURSORS,1
+    env = GDK_SCALE,1.566667
+    env = GDK_DPI_SCALE,0.64
+    env = QT_AUTO_SCREEN_SCALE_FACTOR,1
+    env = QT_SCALE_FACTOR,1.566667
+    env = MOZ_ENABLE_WAYLAND,1
     '';
   };
   
