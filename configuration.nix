@@ -44,6 +44,28 @@ in
   # Enable experimental Nix features (flakes and nix commands)
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  nix.settings = {
+  # Increase download buffer
+  download-buffer-size = 10485760;  # 10MB
+  
+  # Use more builders for parallel builds
+  max-jobs = "auto";
+  cores = 0;  # Use all cores
+  
+  # Optimize storage
+  auto-optimise-store = true;
+  
+  # Trust substituter cache
+  trusted-substituters = [
+    "https://cache.nixos.org"
+    "https://nix-community.cachix.org"
+  ];
+  trusted-public-keys = [
+    "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+    "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+  ];
+};
+
   # Time zone and locale settings
   time.timeZone = "America/New_York";
   i18n.defaultLocale = "en_US.UTF-8";
@@ -304,7 +326,7 @@ in
     font-awesome
     jetbrains-mono
     noto-fonts
-    noto-fonts-cjk
+    noto-fonts-cjk-sans
     noto-fonts-emoji
     liberation_ttf
     fira-code
