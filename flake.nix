@@ -30,6 +30,7 @@
           home-manager.extraSpecialArgs = {
             inherit hyprland;
           };
+          home-manager.backupFileExtension = "backup";
         }
       ];
     };
