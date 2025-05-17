@@ -202,7 +202,12 @@ nixpkgs.overlays = [
     tuir
     bibata-cursors
     kew
-
+    xdotool # for window automation
+    nodejs_20
+    nodePackages.npm
+    code-cursor
+    
+    
     # SDDM Theme - You can keep this for the sugar-dark theme as backup
     (pkgs.fetchFromGitHub {
       owner = "MarianArlt";
