@@ -12,7 +12,6 @@ in
 {
   imports =
     [ # Include the results of the hardware scan and Framework hardware
-      <nixos-hardware/framework/13-inch/7040-amd>
       ./hardware-configuration.nix
     ];
 
@@ -158,7 +157,7 @@ in
   services.thermald.enable = true;
   
   # Enable Power-Profiles-Daemon
-  services.power-profiles-daemon.enable = true;
+  services.power-profiles-daemon.enable = false;
   
   # Enable CUPS for printing
   services.printing = {
@@ -202,7 +201,6 @@ in
   # Configure graphics drivers for AMD
   hardware.opengl = {
     enable = true;
-    driSupport = true;
     driSupport32Bit = true;
     extraPackages = with pkgs; [
       amdvlk
