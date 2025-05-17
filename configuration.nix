@@ -383,7 +383,7 @@ in
     powertop
     
     # System tools
-    gnome.gnome-disk-utility
+    gnome-disk-utility
     libinput-gestures
     
     # Productivity
