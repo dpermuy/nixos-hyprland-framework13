@@ -15,41 +15,30 @@
   systemd.enable = true;
   
   extraConfig = ''
-    # Monitor configuration for Framework 13 (3:2 aspect ratio)
+    # Monitor configuration
     monitor=eDP-1,preferred,auto,1.566667
-    
-    # XWayland scaling
-    xwayland {
-      force_zero_scaling = true
-    }
-    
+
     # Input configuration
     input {
       kb_layout = us
       follow_mouse = 1
       sensitivity = 0
-      accel_profile = flat
-      
       touchpad {
         natural_scroll = true
         disable_while_typing = true
-        tap-to-click = false
-        clickfinger_behavior = true
       }
     }
-    
+
     # General appearance
     general {
       gaps_in = 5
       gaps_out = 10
       border_size = 2
-      col.active_border = rgb(bd93f9) rgb(ff79c6) 45deg
-      col.inactive_border = rgb(44475a)
+      col.active_border = rgba(bd93f9ff) rgba(ff79c6ff) 45deg
+      col.inactive_border = rgba(44475aff)
       layout = dwindle
-      cursor_inactive_timeout = 4
-      no_cursor_warps = false
     }
-    
+
     # Decoration settings
     decoration {
       rounding = 10
@@ -57,16 +46,9 @@
         enabled = true
         size = 3
         passes = 1
-        new_optimizations = true
-        xray = false
       }
-      drop_shadow = true
-      shadow_range = 8
-      shadow_render_power = 2
-      shadow_ignore_window = true
-      col.shadow = rgba(00000044)
     }
-    
+
     # Animation settings
     animations {
       enabled = true
@@ -77,23 +59,13 @@
       animation = fade, 1, 7, default
       animation = workspaces, 1, 6, default
     }
-    
+
     # Layout settings
     dwindle {
       pseudotile = true
       preserve_split = true
-      no_gaps_when_only = false
     }
-    
-    # Miscellaneous
-    misc {
-      disable_hyprland_logo = true
-      disable_splash_rendering = true
-      mouse_move_enables_dpms = true
-      key_press_enables_dpms = true
-      animate_manual_resizes = true
-    }
-    
+
     # Autostart applications
     exec-once = waybar
     exec-once = hyprpaper
@@ -101,86 +73,59 @@
     exec-once = nm-applet --indicator
     exec-once = blueman-applet
     exec-once = hyprctl setcursor Nordzy-cursors 32
-      
-      # Key bindings - Mostly keeping your existing ones
-      bind = SUPER, Return, exec, kitty
-      bind = SUPER, Q, killactive
-      bind = SUPER, M, exit
-      bind = SUPER, E, exec, thunar
-      bind = SUPER, V, togglefloating
-      bind = SUPER, Super_L, exec, wofi --show drun
-      bind = SUPER, D, exec, wofi --show drun
-      bind = SUPER, P, pseudo
-      bind = SUPER, F, fullscreen
-      bind = SUPER, B, exec, firefox
-      
-      # Move focus
-      bind = SUPER, H, movefocus, l
-      bind = SUPER, L, movefocus, r
-      bind = SUPER, K, movefocus, u
-      bind = SUPER, J, movefocus, d
-      
-      # Switch workspaces
-      bind = SUPER, 1, workspace, 1
-      bind = SUPER, 2, workspace, 2
-      bind = SUPER, 3, workspace, 3
-      bind = SUPER, 4, workspace, 4
-      bind = SUPER, 5, workspace, 5
-      bind = SUPER, 6, workspace, 6
-      bind = SUPER, 7, workspace, 7
-      bind = SUPER, 8, workspace, 8
-      bind = SUPER, 9, workspace, 9
-      bind = SUPER, 0, workspace, 10
-      
-      # Move active window to workspace
-      bind = SUPER SHIFT, 1, movetoworkspace, 1
-      bind = SUPER SHIFT, 2, movetoworkspace, 2
-      bind = SUPER SHIFT, 3, movetoworkspace, 3
-      bind = SUPER SHIFT, 4, movetoworkspace, 4
-      bind = SUPER SHIFT, 5, movetoworkspace, 5
-      bind = SUPER SHIFT, 6, movetoworkspace, 6
-      bind = SUPER SHIFT, 7, movetoworkspace, 7
-      bind = SUPER SHIFT, 8, movetoworkspace, 8
-      bind = SUPER SHIFT, 9, movetoworkspace, 9
-      bind = SUPER SHIFT, 0, movetoworkspace, 10
-      
-      # Mouse bindings
-      bindm = SUPER, mouse:272, movewindow
-      bindm = SUPER, mouse:273, resizewindow
-      
-      # Volume control
-      bind = , XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
-      bind = , XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
-      bind = , XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
-      
-      # Brightness control
-      bind = , XF86MonBrightnessDown, exec, brightnessctl set 5%-
-      bind = , XF86MonBrightnessUp, exec, brightnessctl set 5%+
-      
-      # Screenshot binding
-      bind = , Print, exec, grim -g "$(slurp)" - | wl-copy
-      bind = SHIFT, Print, exec, grim - | wl-copy
-      
-      # Window rules
-      windowrule = float, ^(pavucontrol)$
-      windowrule = float, ^(blueman-manager)$
-      windowrule = float, ^(nm-connection-editor)$
-      windowrule = float, ^(file-roller)$
-      windowrule = float, title:^(Picture-in-Picture)$
-      windowrule = size 60% 60%, title:^(Picture-in-Picture)$
-      windowrule = move 39% 39%, title:^(Picture-in-Picture)$
-      
-      # Environment variables adjusted for Framework display
+
+    # Key bindings
+    bind = SUPER, Return, exec, kitty
+    bind = SUPER, Q, killactive
+    bind = SUPER, M, exit
+    bind = SUPER, E, exec, thunar
+    bind = SUPER, V, togglefloating
+    bind = SUPER, D, exec, wofi --show drun
+    bind = SUPER, F, fullscreen
+    bind = SUPER, B, exec, firefox
+
+    # Move focus
+    bind = SUPER, H, movefocus, l
+    bind = SUPER, L, movefocus, r
+    bind = SUPER, K, movefocus, u
+    bind = SUPER, J, movefocus, d
+
+    # Switch workspaces
+    bind = SUPER, 1, workspace, 1
+    bind = SUPER, 2, workspace, 2
+    bind = SUPER, 3, workspace, 3
+    bind = SUPER, 4, workspace, 4
+    bind = SUPER, 5, workspace, 5
+
+    # Move active window to workspace
+    bind = SUPER SHIFT, 1, movetoworkspace, 1
+    bind = SUPER SHIFT, 2, movetoworkspace, 2
+    bind = SUPER SHIFT, 3, movetoworkspace, 3
+    bind = SUPER SHIFT, 4, movetoworkspace, 4
+    bind = SUPER SHIFT, 5, movetoworkspace, 5
+
+    # Mouse bindings
+    bindm = SUPER, mouse:272, movewindow
+    bindm = SUPER, mouse:273, resizewindow
+
+    # Volume control
+    bind = , XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+    bind = , XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+    bind = , XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+
+    # Brightness control
+    bind = , XF86MonBrightnessDown, exec, brightnessctl set 5%-
+    bind = , XF86MonBrightnessUp, exec, brightnessctl set 5%+
+
+    # Environment variables for scaling
     env = XCURSOR_THEME,Nordzy-cursors
     env = XCURSOR_SIZE,32
     env = WLR_NO_HARDWARE_CURSORS,1
     env = GDK_SCALE,1.566667
     env = GDK_DPI_SCALE,0.64
-    env = QT_AUTO_SCREEN_SCALE_FACTOR,1
-    env = QT_SCALE_FACTOR,1.566667
     env = MOZ_ENABLE_WAYLAND,1
-    '';
-  };
+  '';
+};
   
   # TERMINAL CONFIGURATION
   programs.kitty = {
