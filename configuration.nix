@@ -205,7 +205,6 @@ in
     extraPackages = with pkgs; [
       amdvlk
       rocmPackages.clr      # This is the ROCm OpenCL runtime
-      rocmPackages.rocm-opencl-icd  # Try this if available
     ];
   };
   
