@@ -1,21 +1,28 @@
+# Modern Wofi Configuration for Framework 13 with 1.6x scaling
 # home/.config/wofi/config
-# Wofi configuration for Framework 13 with 1.175x scaling
 
-# Window dimensions and positioning
-width=600
-height=400
+# Window dimensions - larger for better icon display
+width=700
+height=500
 
-# Font scaling for better readability
-font=JetBrains Mono 14
-
-# Layout
+# Layout settings
+show=drun
+mode=drun
+allow_images=true
+image_size=48
+columns=2
 orientation=vertical
-halign=center
+
+# Positioning
+location=center
+halign=fill
 valign=center
 
-# Appearance
-show=drun
-prompt=Applications
+# Font and text
+font=JetBrains Mono 14
+prompt=Search Applications...
+
+# Behavior
 filter_rate=100
 allow_markup=true
 no_actions=true
@@ -23,10 +30,17 @@ show_all=false
 print_command=true
 layer=overlay
 insensitive=true
+matching=fuzzy
 
-# Performance
+# Performance and caching
 cache_file=/home/dylan/.cache/wofi-drun
 gtk_dark=true
-
-# Scaling fixes
 dpi_aware=true
+
+# Enable proper icon support
+normal_window=false
+term=kitty
+
+# Key bindings
+key_expand=Tab
+key_exit=Escape
