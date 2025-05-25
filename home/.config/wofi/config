@@ -1,0 +1,32 @@
+# home/.config/wofi/config
+# Wofi configuration for Framework 13 with 1.175x scaling
+
+# Window dimensions and positioning
+width=600
+height=400
+
+# Font scaling for better readability
+font=JetBrains Mono 14
+
+# Layout
+orientation=vertical
+halign=center
+valign=center
+
+# Appearance
+show=drun
+prompt=Applications
+filter_rate=100
+allow_markup=true
+no_actions=true
+show_all=false
+print_command=true
+layer=overlay
+insensitive=true
+
+# Performance
+cache_file=/home/dylan/.cache/wofi-drun
+gtk_dark=true
+
+# Scaling fixes
+dpi_aware=true

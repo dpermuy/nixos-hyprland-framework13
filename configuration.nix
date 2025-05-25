@@ -187,10 +187,10 @@ in
     };
   };
   
-  # Graphics
-  hardware.opengl = {
+  # Graphics (updated for newer NixOS)
+  hardware.graphics = {
     enable = true;
-    driSupport32Bit = true;
+    enable32Bit = true;
     extraPackages = with pkgs; [
       amdvlk
       rocmPackages.clr
@@ -227,17 +227,27 @@ in
   programs.firefox.enable = true;
   nixpkgs.config.allowUnfree = true;
   
-  # Environment variables
+  # Environment variables (enhanced for better scaling)
   environment.variables = {
+    # Wayland
     MOZ_ENABLE_WAYLAND = "1";
     MOZ_USE_XINPUT2 = "1";
     WLR_NO_HARDWARE_CURSORS = "1";
+    
+    # HiDPI settings for 1.175x scaling
     GDK_SCALE = "1.175"; 
     GDK_DPI_SCALE = "0.85";
     QT_AUTO_SCREEN_SCALE_FACTOR = "1";
     QT_SCALE_FACTOR = "1.175";
+    QT_FONT_DPI = "112";  # Added for better Qt scaling
+    
+    # Cursor
     XCURSOR_THEME = "Nordzy-cursors";
     XCURSOR_SIZE = "32";
+    
+    # Force scaling for problematic apps
+    WINIT_X11_SCALE_FACTOR = "1.175";
+    _JAVA_OPTIONS = "-Dsun.java2d.uiScale=1.175";
   };
 
   # GTK cursor configuration
@@ -419,6 +429,11 @@ in
     jq
     cliphist
     brightnessctl
+    
+    # Scaling and theme packages
+    gnome-themes-extra
+    papirus-icon-theme
+    nordzy-cursor-theme
   ];
 
   system.stateVersion = "24.11";

@@ -88,13 +88,13 @@
       bind = SUPER, M, exit
       bind = SUPER, E, exec, thunar
       bind = SUPER, V, togglefloating
-      bind = SUPER, D, exec, wofi --show drun
+      bind = SUPER, D, exec, env GDK_SCALE=1.175 wofi --show drun
       bind = SUPER, F, fullscreen
       bind = SUPER, B, exec, firefox
       bind = SUPER, L, exec, swaylock
       
-      # Super key alone opens wofi
-      bindr = SUPER, Super_L, exec, wofi --show drun
+      # Super key alone opens wofi with proper scaling
+      bindr = SUPER, Super_L, exec, env GDK_SCALE=1.175 wofi --show drun
 
       # Move focus
       bind = SUPER, H, movefocus, l
@@ -147,10 +147,10 @@
     '';
   };
   
-  # TERMINAL CONFIGURATION for 1.175x scaling
+  # TERMINAL CONFIGURATION for 1.175x scaling (updated for newer home-manager)
   programs.kitty = {
     enable = true;
-    theme = "Dracula";
+    themeFile = "Dracula";
     settings = {
       background_opacity = "0.95";
       font_family = "JetBrains Mono";
@@ -162,31 +162,33 @@
     };
   };
 
-  # VS CODE CONFIGURATION for 1.175x scaling
+  # VS CODE CONFIGURATION for 1.175x scaling (updated for newer home-manager)
   programs.vscode = {
     enable = true;
-    extensions = with pkgs.vscode-extensions; [
-      dracula-theme.theme-dracula
-      vscodevim.vim
-      yzhang.markdown-all-in-one
-      bbenoist.nix
-      ms-vscode.hexeditor
-      ms-python.python
-    ];
-    userSettings = {
-      "editor.fontFamily" = "'JetBrains Mono', 'Droid Sans Mono', 'monospace'";
-      "editor.fontSize" = 13;
-      "editor.fontLigatures" = true;
-      "editor.renderWhitespace" = "boundary";
-      "editor.minimap.enabled" = false;
-      "workbench.colorTheme" = "Dracula";
-      "window.zoomLevel" = 0.2;
-      "files.autoSave" = "afterDelay";
-      "telemetry.telemetryLevel" = "off";
-      "editor.cursorBlinking" = "smooth";
-      "editor.cursorSmoothCaretAnimation" = "on";
-      "workbench.list.smoothScrolling" = true;
-      "editor.smoothScrolling" = true;
+    profiles.default = {
+      extensions = with pkgs.vscode-extensions; [
+        dracula-theme.theme-dracula
+        vscodevim.vim
+        yzhang.markdown-all-in-one
+        bbenoist.nix
+        ms-vscode.hexeditor
+        ms-python.python
+      ];
+      userSettings = {
+        "editor.fontFamily" = "'JetBrains Mono', 'Droid Sans Mono', 'monospace'";
+        "editor.fontSize" = 13;
+        "editor.fontLigatures" = true;
+        "editor.renderWhitespace" = "boundary";
+        "editor.minimap.enabled" = false;
+        "workbench.colorTheme" = "Dracula";
+        "window.zoomLevel" = 0.2;
+        "files.autoSave" = "afterDelay";
+        "telemetry.telemetryLevel" = "off";
+        "editor.cursorBlinking" = "smooth";
+        "editor.cursorSmoothCaretAnimation" = "on";
+        "workbench.list.smoothScrolling" = true;
+        "editor.smoothScrolling" = true;
+      };
     };
   };
 
@@ -206,9 +208,13 @@
         "privacy.trackingprotection.socialtracking.enabled" = true;
         "dom.security.https_only_mode" = true;
         
-        # UI scaling for 1.175x
+        # UI scaling for 1.175x - FIXED
         "layout.css.devPixelsPerPx" = "1.175";
-        "browser.uidensity" = 1;
+        "browser.uidensity" = 0;  # Changed from 1 to 0 for normal density
+        
+        # Force UI scaling
+        "browser.display.use_system_colors" = false;
+        "widget.use-xdg-desktop-portal.file-picker" = 1;
         
         # Better aesthetics
         "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
@@ -219,6 +225,93 @@
       };
     };
   };
+
+  # Wofi configuration for better scaling
+  home.file.".config/wofi/config".text = ''
+    width=600
+    height=400
+    font=JetBrains Mono 14
+    orientation=vertical
+    halign=center
+    valign=center
+    show=drun
+    prompt=Applications
+    filter_rate=100
+    allow_markup=true
+    no_actions=true
+    show_all=false
+    print_command=true
+    layer=overlay
+    insensitive=true
+    cache_file=/home/dylan/.cache/wofi-drun
+    gtk_dark=true
+    dpi_aware=true
+  '';
+
+  # Create the wofi style with better scaling
+  home.file.".config/wofi/style.css".text = ''
+    window {
+        margin: 0px;
+        border: 2px solid #bd93f9;
+        background-color: #282a36;
+        border-radius: 15px;
+        font-size: 14px;
+    }
+
+    #input {
+        margin: 5px;
+        border: 2px solid #6272a4;
+        background-color: #44475a;
+        color: #f8f8f2;
+        border-radius: 10px;
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    #inner-box {
+        margin: 5px;
+        background-color: #282a36;
+        color: #f8f8f2;
+        border-radius: 10px;
+    }
+
+    #outer-box {
+        margin: 5px;
+        padding: 10px;
+        background-color: #282a36;
+        border-radius: 10px;
+    }
+
+    #scroll {
+        margin: 5px;
+        border: 2px solid #6272a4;
+        background-color: #44475a;
+        border-radius: 10px;
+    }
+
+    #text {
+        margin: 5px;
+        color: #f8f8f2;
+        font-size: 14px;
+        padding: 4px;
+    }
+
+    #entry {
+        padding: 8px;
+        margin: 2px;
+        min-height: 32px;
+    }
+
+    #entry:selected {
+        background-color: #44475a;
+        border-radius: 10px;
+    }
+
+    #text:selected {
+        color: #ff79c6;
+        font-weight: bold;
+    }
+  '';
   
   # WAYBAR CONFIGURATION
   programs.waybar = {
