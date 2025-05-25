@@ -384,7 +384,7 @@ in
     # Additional utilities
     swaybg
     imagemagick
-    neofetch
+    fastfetch
     pipes
     
     # Custom scripts
