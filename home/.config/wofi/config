@@ -1,4 +1,4 @@
-# Modern Wofi Configuration for Framework 13 with 1.6x scaling
+# Performance-Optimized Wofi Configuration for Framework 13 with 1.6x scaling
 # home/.config/wofi/config
 
 # Window dimensions - larger for better icon display
@@ -22,7 +22,7 @@ valign=center
 font=JetBrains Mono 14
 prompt=Search Applications...
 
-# Behavior
+# Behavior - optimized for performance
 filter_rate=100
 allow_markup=true
 no_actions=true
@@ -32,15 +32,28 @@ layer=overlay
 insensitive=true
 matching=fuzzy
 
-# Performance and caching
+# Performance optimizations
 cache_file=/home/dylan/.cache/wofi-drun
 gtk_dark=true
 dpi_aware=true
 
-# Enable proper icon support
+# Improved performance settings
 normal_window=false
 term=kitty
+
+# Reduce update frequency for better performance
+exec_search=false
+search=""
 
 # Key bindings
 key_expand=Tab
 key_exit=Escape
+
+# Performance tweaks
+dynamic_lines=true
+parse_search=true
+hide_search=false
+
+# Cache settings for faster startup
+cache_file=/home/dylan/.cache/wofi-drun
+cache_timeout=3600
