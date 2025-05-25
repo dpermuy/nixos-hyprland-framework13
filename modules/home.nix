@@ -129,17 +129,18 @@
   
   # TERMINAL CONFIGURATION
   programs.kitty = {
-    enable = true;
-    theme = "Dracula";
-    settings = {
-      background_opacity = "0.95";
-      font_family = "JetBrains Mono";
-      font_size = 12;
-      enable_audio_bell = false;
-      window_padding_width = 10;
-      shell = "${pkgs.zsh}/bin/zsh";
-    };
+  enable = true;
+  theme = "Dracula";
+  settings = {
+    background_opacity = "0.95";
+    font_family = "JetBrains Mono";
+    font_size = 12;
+    enable_audio_bell = false;
+    window_padding_width = 10;
+    # Remove the hardcoded shell path - let it use the default
+    # shell = "${pkgs.zsh}/bin/zsh";
   };
+};
   
   # ZSH CONFIGURATION
   programs.zsh = {
