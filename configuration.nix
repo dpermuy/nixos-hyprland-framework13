@@ -416,6 +416,71 @@ in
     (pkgs.writeShellScriptBin "power-menu" ''
       ${pkgs.wlogout}/bin/wlogout
     '')
+
+    # Power management scripts for TLP
+    (pkgs.writeShellScriptBin "power-menu-battery" ''
+    #!/bin/bash
+    # Interactive power menu for battery management
+  
+    choice=$(echo -e "󰂄 Battery Status\n⚡ AC Profile\n🔋 Battery Profile\n⚙️ TLP Settings\n📊 Power Statistics\n🔧 Advanced TLP Config" | wofi --dmenu --prompt "Power Management")
+  
+    case "$choice" in
+    "󰂄 Battery Status")
+      kitty --class floating-terminal -e bash -c "
+        echo '=== Battery Information ==='
+        upower -i /org/freedesktop/UPower/devices/battery_BAT0
+        echo ''
+        echo '=== TLP Status ==='
+        sudo tlp-stat -b
+        read -p 'Press Enter to close...'
+      "
+      ;;
+    "⚡ AC Profile")
+      sudo tlp ac && notify-send "TLP" "Switched to AC profile (Performance mode)"
+      ;;
+    "🔋 Battery Profile") 
+      sudo tlp bat && notify-send "TLP" "Switched to Battery profile (Power saving mode)"
+      ;;
+    "⚙️ TLP Settings")
+      kitty --class floating-terminal -e bash -c "
+        echo '=== Current TLP Configuration ==='
+        sudo tlp-stat -c
+        echo ''
+        read -p 'Press Enter to close...'
+      "
+      ;;
+    "📊 Power Statistics")
+      kitty --class floating-terminal -e bash -c "
+        echo '=== Power Statistics ==='
+        sudo tlp-stat -s
+        echo ''
+        echo '=== Temperature Sensors ==='
+        sensors
+        echo ''
+        read -p 'Press Enter to close...'
+      "
+      ;;
+    "🔧 Advanced TLP Config")
+      $EDITOR /etc/tlp.conf || sudo nano /etc/tlp.conf
+      ;;
+  esac
+'')
+
+(pkgs.writeShellScriptBin "tlp-toggle-mode" ''
+  #!/bin/bash
+  # Toggle between AC and Battery modes
+  
+  # Check current power source
+  if acpi -a | grep -q "on-line"; then
+    # On AC power - force battery mode for testing/power saving
+    sudo tlp bat
+    notify-send "TLP" "Forced Battery Profile (Power Saving)" -i battery-caution
+  else
+    # On battery - switch to AC mode for performance
+    sudo tlp ac  
+    notify-send "TLP" "Forced AC Profile (Performance)" -i battery-full-charging
+  fi
+'')
     
     # SDDM theme backup
     (pkgs.fetchFromGitHub {

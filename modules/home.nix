@@ -628,25 +628,33 @@ programs.waybar = {
         # bat = "BAT0";
         # adapter = "ADP1";
         interval = 10;
-        states = {
-          warning = 30;
-          critical = 15;
-        };
-        max-length = 25;
-        # Enhanced format to ensure percentage is always visible
-        format = "{icon} {capacity}%";
-        format-warning = "󰂃 {capacity}%";
-        format-critical = "󰁺 {capacity}%";
-        format-charging = "󰂄 {capacity}%";
-        format-plugged = "󰂄 {capacity}%";
-        format-alt = "{icon} {time} ({capacity}%)";  # Show percentage even in alt format
-        format-full = "󰁹 {capacity}%";
-        format-icons = ["󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹"];
-        tooltip = true;
-        tooltip-format = "{timeTo}, {capacity}%\n{power}W";
-        # Fallback if battery isn't detected
-        format-not-charging = "󰂄 {capacity}%";
-      };
+  states = {
+    warning = 30;
+    critical = 15;
+  };
+  max-length = 25;
+  format = "{icon} {capacity}%";
+  format-warning = "󰂃 {capacity}%";
+  format-critical = "󰁺 {capacity}%";
+  format-charging = "󰂄 {capacity}%";
+  format-plugged = "󰂄 {capacity}%";
+  format-alt = "{icon} {time} ({capacity}%)";
+  format-full = "󰁹 {capacity}%";
+  format-icons = ["󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹"];
+  tooltip = true;
+  tooltip-format = "{timeTo}, {capacity}%\n{power}W\nLeft: Power Menu | Right: Toggle Mode | Scroll: Quick Switch";
+  
+  # Click actions for TLP power management
+  on-click = "power-menu-battery";                    # Left click: Open power menu
+  on-click-right = "tlp-toggle-mode";                # Right click: Toggle AC/Battery mode
+  on-click-middle = "kitty --class power-stats -e sudo tlp-stat -s"; # Middle click: Quick stats
+  
+  # Scroll to quickly change power profiles
+  on-scroll-up = "sudo tlp ac && notify-send 'TLP' 'AC Profile (Performance)'";
+  on-scroll-down = "sudo tlp bat && notify-send 'TLP' 'Battery Profile (Power Saving)'";
+  
+  format-not-charging = "󰂄 {capacity}%";
+};
 
       tray = {
         icon-size = 12;  # Reduced from 16 (16 * 0.75 = 12)
