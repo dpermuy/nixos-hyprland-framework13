@@ -287,9 +287,7 @@ in
     })
   ];
 
-  # Updated sections for configuration.nix - Back to 1.175x scaling
-
-  # Environment variables for 1.175x scaling (update existing section)
+  # Environment variables for 1.175x scaling (CONSOLIDATED)
   environment.variables = {
     # Wayland specific
     MOZ_ENABLE_WAYLAND = "1";
@@ -323,49 +321,6 @@ in
     gtk-cursor-theme-size=32
   '';
 
-  # Add weather script for waybar (add to systemPackages)
-  environment.systemPackages = with pkgs; [
-    # ... existing packages ...
-    
-    # Additional packages for modern waybar
-    curl  # For weather module
-    jq    # For JSON processing in scripts
-    
-    # Weather script for waybar
-    (pkgs.writeShellScriptBin "waybar-weather" ''
-      #!/bin/bash
-      # Simple weather script for waybar
-      location="New+York"  # Change this to your location
-      
-      # Get weather data from wttr.in
-      weather=$(curl -s "https://wttr.in/$location?format=1" 2>/dev/null | head -c -1)
-      
-      if [ -z "$weather" ]; then
-        echo "󰼢 N/A"
-      else
-        echo "$weather"
-      fi
-    '')
-    
-    # System monitoring script
-    (pkgs.writeShellScriptBin "waybar-system" ''
-      #!/bin/bash
-      # System info script for waybar tooltips
-      case "$1" in
-        "cpu")
-          echo "CPU: $(nproc) cores"
-          echo "Load: $(uptime | awk -F'load average:' '{print $2}')"
-          ;;
-        "memory")
-          free -h | awk '/^Mem/ {printf "Used: %s/%s (%.1f%%)", $3, $2, $3/$2*100}'
-          ;;
-        *)
-          echo "Usage: waybar-system [cpu|memory]"
-          ;;
-      esac
-    '')
-  ];
-  
   # Font configuration
   fonts.packages = with pkgs; [
     font-awesome
@@ -381,7 +336,7 @@ in
     proggyfonts
   ] ++ builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
   
-  # System packages
+  # System packages (CONSOLIDATED - all packages in one place)
   environment.systemPackages = with pkgs; [
     # Terminal emulators
     kitty
@@ -485,6 +440,40 @@ in
     neofetch
     pipes
     
+    # Weather script for waybar
+    (pkgs.writeShellScriptBin "waybar-weather" ''
+      #!/bin/bash
+      # Simple weather script for waybar
+      location="New+York"  # Change this to your location
+      
+      # Get weather data from wttr.in
+      weather=$(curl -s "https://wttr.in/$location?format=1" 2>/dev/null | head -c -1)
+      
+      if [ -z "$weather" ]; then
+        echo "󰼢 N/A"
+      else
+        echo "$weather"
+      fi
+    '')
+    
+    # System monitoring script
+    (pkgs.writeShellScriptBin "waybar-system" ''
+      #!/bin/bash
+      # System info script for waybar tooltips
+      case "$1" in
+        "cpu")
+          echo "CPU: $(nproc) cores"
+          echo "Load: $(uptime | awk -F'load average:' '{print $2}')"
+          ;;
+        "memory")
+          free -h | awk '/^Mem/ {printf "Used: %s/%s (%.1f%%)", $3, $2, $3/$2*100}'
+          ;;
+        *)
+          echo "Usage: waybar-system [cpu|memory]"
+          ;;
+      esac
+    '')
+    
     # SDDM Theme - Sugar Dark as backup
     (pkgs.fetchFromGitHub {
       owner = "MarianArlt";
@@ -497,6 +486,10 @@ in
     (pkgs.writeShellScriptBin "power-menu" ''
       wlogout
     '')
+    
+    # Additional packages for modern waybar
+    curl  # For weather module
+    jq    # For JSON processing in scripts
   ];
 
   # Update stateVersion (keep your original value)
