@@ -324,322 +324,322 @@ programs.firefox = {
     }
   '';
   
-  # WAYBAR CONFIGURATION for 1.6x scaling
-  programs.waybar = {
-    enable = true;
-    
-    settings = {
-      mainBar = {
-        layer = "top";
-        position = "top";
-        height = 45;  # Adjusted for 1.6x scaling
-        spacing = 0;
-        margin-top = 6;
-        margin-left = 12;
-        margin-right = 12;
-        
-        modules-left = [
-          "custom/launcher"
-          "hyprland/workspaces" 
-        ];
-        modules-center = [
-          "clock"
-        ];
-        modules-right = [
-          "pulseaudio"
-          "network"
-          "cpu"
-          "memory"
-          "battery"
-          "tray"
-          "custom/power"
-        ];
+  # WAYBAR CONFIGURATION scaled down by 25% from 1.6x scaling
+programs.waybar = {
+  enable = true;
+  
+  settings = {
+    mainBar = {
+      layer = "top";
+      position = "top";
+      height = 34;  # Reduced from 45 (45 * 0.75 = 33.75, rounded to 34)
+      spacing = 0;
+      margin-top = 5;  # Reduced from 6 (6 * 0.75 = 4.5, rounded to 5)
+      margin-left = 9;  # Reduced from 12 (12 * 0.75 = 9)
+      margin-right = 9;  # Reduced from 12 (12 * 0.75 = 9)
+      
+      modules-left = [
+        "custom/launcher"
+        "hyprland/workspaces" 
+      ];
+      modules-center = [
+        "clock"
+      ];
+      modules-right = [
+        "pulseaudio"
+        "network"
+        "cpu"
+        "memory"
+        "battery"
+        "tray"
+        "custom/power"
+      ];
 
-        # Module configurations
-        "custom/launcher" = {
-          format = " ";
-          on-click = "wofi --show drun";
-          tooltip = false;
-        };
+      # Module configurations (unchanged - these don't affect visual size)
+      "custom/launcher" = {
+        format = " ";
+        on-click = "wofi --show drun";
+        tooltip = false;
+      };
 
-        "hyprland/workspaces" = {
-          disable-scroll = true;
-          all-outputs = true;
-          format = "{name}";
-          on-click = "activate";
-          sort-by-number = true;
-        };
+      "hyprland/workspaces" = {
+        disable-scroll = true;
+        all-outputs = true;
+        format = "{name}";
+        on-click = "activate";
+        sort-by-number = true;
+      };
 
-        clock = {
-          timezone = "America/New_York";
-          format = "{:%a %d %b  %I:%M %p}";
-          format-alt = "{:%A, %B %d, %Y (%R)}";
-          tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-        };
+      clock = {
+        timezone = "America/New_York";
+        format = "{:%a %d %b  %I:%M %p}";
+        format-alt = "{:%A, %B %d, %Y (%R)}";
+        tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+      };
 
-        pulseaudio = {
-          scroll-step = 5;
-          format = "{icon} {volume}%";
-          format-muted = "󰖁 Muted";
-          format-icons = {
-            headphone = "";
-            hands-free = "";
-            headset = "";
-            phone = "";
-            portable = "";
-            car = "";
-            default = ["" "" ""];
-          };
-          on-click = "pavucontrol";
-          on-click-right = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
-          tooltip = true;
-          tooltip-format = "Volume: {volume}%";
+      pulseaudio = {
+        scroll-step = 5;
+        format = "{icon} {volume}%";
+        format-muted = "󰖁 Muted";
+        format-icons = {
+          headphone = "";
+          hands-free = "";
+          headset = "";
+          phone = "";
+          portable = "";
+          car = "";
+          default = ["" "" ""];
         };
+        on-click = "pavucontrol";
+        on-click-right = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+        tooltip = true;
+        tooltip-format = "Volume: {volume}%";
+      };
 
-        network = {
-          interface = "wlp*";
-          format = "{ifname}";
-          format-wifi = "  {signalStrength}%";
-          format-ethernet = "󰈀 {ipaddr}";
-          format-disconnected = "󰖪 Disconnected";
-          tooltip-format = "{ifname} via {gwaddr} 󰊗";
-          tooltip-format-wifi = "{essid} ({signalStrength}%) 󰤨";
-          tooltip-format-ethernet = "{ifname} 󰈀";
-          tooltip-format-disconnected = "Disconnected";
-          max-length = 50;
-          on-click = "nm-connection-editor";
-        };
+      network = {
+        interface = "wlp*";
+        format = "{ifname}";
+        format-wifi = "  {signalStrength}%";
+        format-ethernet = "󰈀 {ipaddr}";
+        format-disconnected = "󰖪 Disconnected";
+        tooltip-format = "{ifname} via {gwaddr} 󰊗";
+        tooltip-format-wifi = "{essid} ({signalStrength}%) 󰤨";
+        tooltip-format-ethernet = "{ifname} 󰈀";
+        tooltip-format-disconnected = "Disconnected";
+        max-length = 50;
+        on-click = "nm-connection-editor";
+      };
 
-        cpu = {
-          interval = 2;
-          format = "󰍛 {usage}%";
-          max-length = 10;
-          on-click = "kitty --class btop -e btop";
-        };
+      cpu = {
+        interval = 2;
+        format = "󰍛 {usage}%";
+        max-length = 10;
+        on-click = "kitty --class btop -e btop";
+      };
 
-        memory = {
-          interval = 2;
-          format = "󰾆 {percentage}%";
-          tooltip = true;
-          tooltip-format = "Memory: {used:0.1f}G/{total:0.1f}G";
-          on-click = "kitty --class btop -e btop";
-        };
+      memory = {
+        interval = 2;
+        format = "󰾆 {percentage}%";
+        tooltip = true;
+        tooltip-format = "Memory: {used:0.1f}G/{total:0.1f}G";
+        on-click = "kitty --class btop -e btop";
+      };
 
-        battery = {
-          bat = "BAT0";
-          adapter = "ADP1";
-          interval = 10;
-          states = {
-            warning = 30;
-            critical = 15;
-          };
-          max-length = 25;
-          format = "{icon} {capacity}%";
-          format-warning = "󰂃 {capacity}%";
-          format-critical = "󰁺 {capacity}%";
-          format-charging = "󰂄 {capacity}%";
-          format-plugged = "󰂄 {capacity}%";
-          format-alt = "{icon} {time}";
-          format-full = "󰁹 {capacity}%";
-          format-icons = ["󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹"];
-          tooltip = true;
-          tooltip-format = "{timeTo}, {capacity}%\n{power}W";
+      battery = {
+        bat = "BAT0";
+        adapter = "ADP1";
+        interval = 10;
+        states = {
+          warning = 30;
+          critical = 15;
         };
+        max-length = 25;
+        format = "{icon} {capacity}%";
+        format-warning = "󰂃 {capacity}%";
+        format-critical = "󰁺 {capacity}%";
+        format-charging = "󰂄 {capacity}%";
+        format-plugged = "󰂄 {capacity}%";
+        format-alt = "{icon} {time}";
+        format-full = "󰁹 {capacity}%";
+        format-icons = ["󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹"];
+        tooltip = true;
+        tooltip-format = "{timeTo}, {capacity}%\n{power}W";
+      };
 
-        tray = {
-          icon-size = 16;
-          spacing = 6;
-          show-passive-items = true;
-        };
+      tray = {
+        icon-size = 12;  # Reduced from 16 (16 * 0.75 = 12)
+        spacing = 5;     # Reduced from 6 (6 * 0.75 = 4.5, rounded to 5)
+        show-passive-items = true;
+      };
 
-        "custom/power" = {
-          format = "⏻";
-          tooltip = false;
-          on-click = "wlogout";
-          on-click-right = "systemctl poweroff";
-        };
+      "custom/power" = {
+        format = "⏻";
+        tooltip = false;
+        on-click = "wlogout";
+        on-click-right = "systemctl poweroff";
       };
     };
-
-    # CSS styling for 1.6x scaling
-    style = ''
-      * {
-          border: none;
-          border-radius: 0;
-          font-family: "JetBrains Mono Nerd Font", "Font Awesome 6 Free", monospace;
-          font-size: 14px;  /* Adjusted for 1.6x scaling */
-          min-height: 0;
-          margin: 0;
-          padding: 0;
-      }
-
-      window#waybar {
-          background: transparent;
-          color: #f8f8f2;
-      }
-
-      tooltip {
-          background: rgba(40, 42, 54, 0.95);
-          border: 1px solid #6272a4;
-          border-radius: 10px;  /* Adjusted for 1.6x scaling */
-          color: #f8f8f2;
-          font-size: 13px;  /* Adjusted for 1.6x scaling */
-      }
-
-      .modules-left,
-      .modules-center,
-      .modules-right {
-          background: rgba(40, 42, 54, 0.85);
-          border-radius: 18px;  /* Adjusted for 1.6x scaling */
-          margin: 0 6px;  /* Adjusted for 1.6x scaling */
-          padding: 0 6px;  /* Adjusted for 1.6x scaling */
-          border: 2px solid rgba(68, 71, 90, 0.5);
-      }
-
-      .modules-left > widget:first-child > #workspaces,
-      .modules-center > widget > #clock,
-      .modules-right > widget > * {
-          margin: 0 4px;  /* Adjusted for 1.6x scaling */
-          padding: 6px 12px;  /* Adjusted for 1.6x scaling */
-          border-radius: 12px;  /* Adjusted for 1.6x scaling */
-          background: transparent;
-          transition: all 0.3s ease;
-      }
-
-      #custom-launcher {
-          color: #50fa7b;
-          font-size: 18px;  /* Adjusted for 1.6x scaling */
-          font-weight: bold;
-          margin-right: 6px;
-          padding: 6px 15px;
-      }
-
-      #custom-launcher:hover {
-          background: rgba(80, 250, 123, 0.1);
-          color: #50fa7b;
-      }
-
-      #workspaces {
-          padding: 0;
-          margin: 0;
-          background: transparent;
-      }
-
-      #workspaces button {
-          padding: 6px 12px;  /* Adjusted for 1.6x scaling */
-          margin: 0 2px;
-          background: transparent;
-          color: #6272a4;
-          border-radius: 10px;  /* Adjusted for 1.6x scaling */
-          transition: all 0.3s ease;
-          font-size: 15px;  /* Adjusted for 1.6x scaling */
-          min-width: 32px;  /* Adjusted for 1.6x scaling */
-      }
-
-      #workspaces button:hover {
-          background: rgba(98, 114, 164, 0.2);
-          color: #f8f8f2;
-      }
-
-      #workspaces button.active {
-          background: rgba(189, 147, 249, 0.3);
-          color: #bd93f9;
-          font-weight: bold;
-      }
-
-      #clock {
-          color: #f8f8f2;
-          font-weight: 500;
-          font-size: 15px;  /* Adjusted for 1.6x scaling */
-          padding: 6px 16px;  /* Adjusted for 1.6x scaling */
-      }
-
-      #clock:hover {
-          background: rgba(248, 248, 242, 0.1);
-      }
-
-      #pulseaudio {
-          color: #ff79c6;
-      }
-
-      #pulseaudio:hover {
-          background: rgba(255, 121, 198, 0.1);
-      }
-
-      #pulseaudio.muted {
-          color: #6272a4;
-      }
-
-      #network {
-          color: #50fa7b;
-      }
-
-      #network:hover {
-          background: rgba(80, 250, 123, 0.1);
-      }
-
-      #network.disconnected {
-          color: #ff5555;
-      }
-
-      #cpu {
-          color: #ffb86c;
-      }
-
-      #cpu:hover {
-          background: rgba(255, 184, 108, 0.1);
-      }
-
-      #memory {
-          color: #ff79c6;
-      }
-
-      #memory:hover {
-          background: rgba(255, 121, 198, 0.1);
-      }
-
-      #battery {
-          color: #50fa7b;
-      }
-
-      #battery:hover {
-          background: rgba(80, 250, 123, 0.1);
-      }
-
-      #battery.charging {
-          color: #f1fa8c;
-      }
-
-      #battery.warning:not(.charging) {
-          color: #ffb86c;
-      }
-
-      #battery.critical:not(.charging) {
-          color: #ff5555;
-      }
-
-      #tray {
-          background: transparent;
-      }
-
-      #tray > .passive {
-          opacity: 0.5;
-      }
-
-      #custom-power {
-          color: #ff5555;
-          font-size: 18px;  /* Adjusted for 1.6x scaling */
-          font-weight: bold;
-          margin-left: 6px;
-          padding: 6px 15px;
-      }
-
-      #custom-power:hover {
-          background: rgba(255, 85, 85, 0.2);
-          color: #ff5555;
-      }
-    '';
   };
+
+  # CSS styling scaled down by 25%
+  style = ''
+    * {
+        border: none;
+        border-radius: 0;
+        font-family: "JetBrains Mono Nerd Font", "Font Awesome 6 Free", monospace;
+        font-size: 11px;  /* Reduced from 14px (14 * 0.75 = 10.5, rounded to 11) */
+        min-height: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+    window#waybar {
+        background: transparent;
+        color: #f8f8f2;
+    }
+
+    tooltip {
+        background: rgba(40, 42, 54, 0.95);
+        border: 1px solid #6272a4;
+        border-radius: 8px;  /* Reduced from 10px (10 * 0.75 = 7.5, rounded to 8) */
+        color: #f8f8f2;
+        font-size: 10px;  /* Reduced from 13px (13 * 0.75 = 9.75, rounded to 10) */
+    }
+
+    .modules-left,
+    .modules-center,
+    .modules-right {
+        background: rgba(40, 42, 54, 0.85);
+        border-radius: 14px;  /* Reduced from 18px (18 * 0.75 = 13.5, rounded to 14) */
+        margin: 0 5px;  /* Reduced from 6px (6 * 0.75 = 4.5, rounded to 5) */
+        padding: 0 5px;  /* Reduced from 6px (6 * 0.75 = 4.5, rounded to 5) */
+        border: 2px solid rgba(68, 71, 90, 0.5);
+    }
+
+    .modules-left > widget:first-child > #workspaces,
+    .modules-center > widget > #clock,
+    .modules-right > widget > * {
+        margin: 0 3px;  /* Reduced from 4px (4 * 0.75 = 3) */
+        padding: 5px 9px;  /* Reduced from 6px 12px (6*0.75=4.5→5, 12*0.75=9) */
+        border-radius: 9px;  /* Reduced from 12px (12 * 0.75 = 9) */
+        background: transparent;
+        transition: all 0.3s ease;
+    }
+
+    #custom-launcher {
+        color: #50fa7b;
+        font-size: 14px;  /* Reduced from 18px (18 * 0.75 = 13.5, rounded to 14) */
+        font-weight: bold;
+        margin-right: 5px;  /* Reduced from 6px (6 * 0.75 = 4.5, rounded to 5) */
+        padding: 5px 11px;  /* Reduced from 6px 15px (6*0.75=4.5→5, 15*0.75=11.25→11) */
+    }
+
+    #custom-launcher:hover {
+        background: rgba(80, 250, 123, 0.1);
+        color: #50fa7b;
+    }
+
+    #workspaces {
+        padding: 0;
+        margin: 0;
+        background: transparent;
+    }
+
+    #workspaces button {
+        padding: 5px 9px;  /* Reduced from 6px 12px (6*0.75=4.5→5, 12*0.75=9) */
+        margin: 0 2px;  /* Reduced from 2px (2 * 0.75 = 1.5, rounded to 2) */
+        background: transparent;
+        color: #6272a4;
+        border-radius: 8px;  /* Reduced from 10px (10 * 0.75 = 7.5, rounded to 8) */
+        transition: all 0.3s ease;
+        font-size: 11px;  /* Reduced from 15px (15 * 0.75 = 11.25, rounded to 11) */
+        min-width: 24px;  /* Reduced from 32px (32 * 0.75 = 24) */
+    }
+
+    #workspaces button:hover {
+        background: rgba(98, 114, 164, 0.2);
+        color: #f8f8f2;
+    }
+
+    #workspaces button.active {
+        background: rgba(189, 147, 249, 0.3);
+        color: #bd93f9;
+        font-weight: bold;
+    }
+
+    #clock {
+        color: #f8f8f2;
+        font-weight: 500;
+        font-size: 11px;  /* Reduced from 15px (15 * 0.75 = 11.25, rounded to 11) */
+        padding: 5px 12px;  /* Reduced from 6px 16px (6*0.75=4.5→5, 16*0.75=12) */
+    }
+
+    #clock:hover {
+        background: rgba(248, 248, 242, 0.1);
+    }
+
+    #pulseaudio {
+        color: #ff79c6;
+    }
+
+    #pulseaudio:hover {
+        background: rgba(255, 121, 198, 0.1);
+    }
+
+    #pulseaudio.muted {
+        color: #6272a4;
+    }
+
+    #network {
+        color: #50fa7b;
+    }
+
+    #network:hover {
+        background: rgba(80, 250, 123, 0.1);
+    }
+
+    #network.disconnected {
+        color: #ff5555;
+    }
+
+    #cpu {
+        color: #ffb86c;
+    }
+
+    #cpu:hover {
+        background: rgba(255, 184, 108, 0.1);
+    }
+
+    #memory {
+        color: #ff79c6;
+    }
+
+    #memory:hover {
+        background: rgba(255, 121, 198, 0.1);
+    }
+
+    #battery {
+        color: #50fa7b;
+    }
+
+    #battery:hover {
+        background: rgba(80, 250, 123, 0.1);
+    }
+
+    #battery.charging {
+        color: #f1fa8c;
+    }
+
+    #battery.warning:not(.charging) {
+        color: #ffb86c;
+    }
+
+    #battery.critical:not(.charging) {
+        color: #ff5555;
+    }
+
+    #tray {
+        background: transparent;
+    }
+
+    #tray > .passive {
+        opacity: 0.5;
+    }
+
+    #custom-power {
+        color: #ff5555;
+        font-size: 14px;  /* Reduced from 18px (18 * 0.75 = 13.5, rounded to 14) */
+        font-weight: bold;
+        margin-left: 5px;  /* Reduced from 6px (6 * 0.75 = 4.5, rounded to 5) */
+        padding: 5px 11px;  /* Reduced from 6px 15px (6*0.75=4.5→5, 15*0.75=11.25→11) */
+    }
+
+    #custom-power:hover {
+        background: rgba(255, 85, 85, 0.2);
+        color: #ff5555;
+    }
+  '';
+};
 
   # GTK configuration for 1.6x scaling
   gtk = {
