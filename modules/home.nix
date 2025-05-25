@@ -192,41 +192,50 @@
     };
   };
 
-  # Firefox with 67% scaling (reduced from full 1.6x)
-  programs.firefox = {
-    enable = true;
-    profiles.default = {
-      name = "Default";
-      settings = {
-        # Performance settings
-        "gfx.webrender.all" = true;
-        "media.ffmpeg.vaapi.enabled" = true;
-        "media.ffvpx.enabled" = false;
-        
-        # Privacy settings
-        "privacy.trackingprotection.enabled" = true;
-        "privacy.trackingprotection.socialtracking.enabled" = true;
-        "dom.security.https_only_mode" = true;
-        
-        # UI scaling - 67% of 1.6x scaling
-        "layout.css.devPixelsPerPx" = "1.072";  # 67% of 1.6 = 1.072
-        "browser.uidensity" = 1;  # Compact UI for more space
-        
-        # Force UI scaling for Firefox
-        "widget.gtk.overlay-scrollbars.enabled" = false;
-        "browser.display.use_system_colors" = false;
-        "widget.use-xdg-desktop-portal.file-picker" = 1;
-        "ui.textScaleFactor" = 107;  # 107% text scaling (67% of 160%)
-        
-        # Better aesthetics
-        "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-        "browser.tabs.loadInBackground" = true;
-        "browser.urlbar.suggest.bookmark" = true;
-        "browser.urlbar.suggest.history" = true;
-        "browser.urlbar.suggest.openpage" = true;
-      };
+  # Firefox with improved scaling (33% bigger than current)
+programs.firefox = {
+  enable = true;
+  profiles.default = {
+    name = "Default";
+    settings = {
+      # Performance settings
+      "gfx.webrender.all" = true;
+      "media.ffmpeg.vaapi.enabled" = true;
+      "media.ffvpx.enabled" = false;
+      
+      # Privacy settings
+      "privacy.trackingprotection.enabled" = true;
+      "privacy.trackingprotection.socialtracking.enabled" = true;
+      "dom.security.https_only_mode" = true;
+      
+      # UI scaling - Increased by 33% from previous 1.072
+      "layout.css.devPixelsPerPx" = "1.426";  # 1.072 * 1.33 = 1.426
+      "browser.uidensity" = 0;  # Changed from 1 (compact) to 0 (normal) for larger UI elements
+      
+      # Force UI scaling for Firefox
+      "widget.gtk.overlay-scrollbars.enabled" = false;
+      "browser.display.use_system_colors" = false;
+      "widget.use-xdg-desktop-portal.file-picker" = 1;
+      "ui.textScaleFactor" = 143;  # Increased from 107 to 143 (33% bigger)
+      
+      # Better aesthetics
+      "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+      "browser.tabs.loadInBackground" = true;
+      "browser.urlbar.suggest.bookmark" = true;
+      "browser.urlbar.suggest.history" = true;
+      "browser.urlbar.suggest.openpage" = true;
+      
+      # Additional scaling improvements
+      "browser.chrome.site_icons" = true;
+      "browser.chrome.favicons" = true;
+      "security.dialog_enable_delay" = 0;
+      
+      # Ensure proper DPI awareness
+      "layout.css.dpi" = 154;  # 96 * 1.6 (your system scaling)
+      "browser.zoom.full" = true;  # Enable full page zoom instead of text-only
     };
   };
+};
 
   # Wofi configuration for 1.6x scaling
   home.file.".config/wofi/config".text = ''
