@@ -287,25 +287,27 @@ in
     })
   ];
 
-  # Environment variables for better HiDPI and Wayland support
+  # Updated sections for configuration.nix - Back to 1.175x scaling
+
+  # Environment variables for 1.175x scaling (update existing section)
   environment.variables = {
     # Wayland specific
     MOZ_ENABLE_WAYLAND = "1";
     MOZ_USE_XINPUT2 = "1";
     WLR_NO_HARDWARE_CURSORS = "1";
     
-    # HiDPI settings for consistent scaling
-    GDK_SCALE = "1.5"; 
-    GDK_DPI_SCALE = "0.75";
+    # HiDPI settings for 1.175x scaling
+    GDK_SCALE = "1.175"; 
+    GDK_DPI_SCALE = "0.85";
     QT_AUTO_SCREEN_SCALE_FACTOR = "1";
-    QT_SCALE_FACTOR = "1.5";
+    QT_SCALE_FACTOR = "1.175";
     
-    # Cursor configuration
+    # Cursor configuration back to 32px for 1.175x
     XCURSOR_THEME = "Nordzy-cursors";
     XCURSOR_SIZE = "32";
   };
-  
-  # Make cursor configuration consistent
+
+  # Updated cursor configuration for 1.175x scaling
   environment.etc."gtk-2.0/gtkrc".text = ''
     gtk-cursor-theme-name="Nordzy-cursors"
     gtk-cursor-theme-size=32
@@ -320,6 +322,49 @@ in
     gtk-cursor-theme-name=Nordzy-cursors
     gtk-cursor-theme-size=32
   '';
+
+  # Add weather script for waybar (add to systemPackages)
+  environment.systemPackages = with pkgs; [
+    # ... existing packages ...
+    
+    # Additional packages for modern waybar
+    curl  # For weather module
+    jq    # For JSON processing in scripts
+    
+    # Weather script for waybar
+    (pkgs.writeShellScriptBin "waybar-weather" ''
+      #!/bin/bash
+      # Simple weather script for waybar
+      location="New+York"  # Change this to your location
+      
+      # Get weather data from wttr.in
+      weather=$(curl -s "https://wttr.in/$location?format=1" 2>/dev/null | head -c -1)
+      
+      if [ -z "$weather" ]; then
+        echo "󰼢 N/A"
+      else
+        echo "$weather"
+      fi
+    '')
+    
+    # System monitoring script
+    (pkgs.writeShellScriptBin "waybar-system" ''
+      #!/bin/bash
+      # System info script for waybar tooltips
+      case "$1" in
+        "cpu")
+          echo "CPU: $(nproc) cores"
+          echo "Load: $(uptime | awk -F'load average:' '{print $2}')"
+          ;;
+        "memory")
+          free -h | awk '/^Mem/ {printf "Used: %s/%s (%.1f%%)", $3, $2, $3/$2*100}'
+          ;;
+        *)
+          echo "Usage: waybar-system [cpu|memory]"
+          ;;
+      esac
+    '')
+  ];
   
   # Font configuration
   fonts.packages = with pkgs; [

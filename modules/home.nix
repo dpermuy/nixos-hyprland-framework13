@@ -1,24 +1,12 @@
-# Updated modules/home.nix with 2x scaling and QoL improvements
-
-{ config, pkgs, hyprland, ... }:
-
-{
-  # Home Manager Configuration
-  home.username = "dylan";
-  home.homeDirectory = "/home/dylan";
-  
-  # Let Home Manager install and manage itself
-  programs.home-manager.enable = true;
-  
-  # HYPRLAND CONFIGURATION with 2x scaling (FIXED)
+# HYPRLAND CONFIGURATION with 1.175x scaling (UPDATED)
   wayland.windowManager.hyprland = {
     enable = true;
     package = hyprland.packages.${pkgs.system}.hyprland;
     systemd.enable = true;
     
     extraConfig = ''
-      # Monitor configuration with 2x scaling
-      monitor=eDP-1,preferred,auto,2.0
+      # Monitor configuration with 1.175x scaling
+      monitor=eDP-1,preferred,auto,1.175
 
       # Input configuration
       input {
@@ -32,29 +20,24 @@
         }
       }
 
-      # General appearance for 2x scaling
+      # General appearance for 1.175x scaling
       general {
-        gaps_in = 8
-        gaps_out = 16
-        border_size = 3
+        gaps_in = 5
+        gaps_out = 10
+        border_size = 2
         col.active_border = rgba(bd93f9ff) rgba(ff79c6ff) 45deg
         col.inactive_border = rgba(44475aff)
         layout = dwindle
       }
 
-      # Decoration settings for 2x scaling (REMOVED shadow options)
+      # Decoration settings for 1.175x scaling
       decoration {
-        rounding = 12
+        rounding = 10
         blur {
           enabled = true
-          size = 6
-          passes = 2
+          size = 3
+          passes = 1
         }
-        # Removed deprecated shadow options:
-        # drop_shadow = true
-        # shadow_range = 12
-        # shadow_render_power = 2
-        # col.shadow = rgba(00000044)
       }
 
       # Animation settings
@@ -80,7 +63,7 @@
       exec-once = swaync
       exec-once = nm-applet --indicator
       exec-once = blueman-applet
-      exec-once = hyprctl setcursor Nordzy-cursors 48
+      exec-once = hyprctl setcursor Nordzy-cursors 32
       exec-once = cliphist daemon  # Clipboard history
 
       # Key bindings
@@ -138,102 +121,32 @@
       # Clipboard history
       bind = SUPER, C, exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy
 
-      # Environment variables for 2x scaling
+      # Environment variables for 1.175x scaling
       env = XCURSOR_THEME,Nordzy-cursors
-      env = XCURSOR_SIZE,48
+      env = XCURSOR_SIZE,32
       env = WLR_NO_HARDWARE_CURSORS,1
-      env = GDK_SCALE,2.0
-      env = GDK_DPI_SCALE,0.5
+      env = GDK_SCALE,1.175
+      env = GDK_DPI_SCALE,0.85
       env = MOZ_ENABLE_WAYLAND,1
     '';
   };
   
-  # TERMINAL CONFIGURATION for 2x scaling
+  # TERMINAL CONFIGURATION for 1.175x scaling
   programs.kitty = {
     enable = true;
     theme = "Dracula";
     settings = {
       background_opacity = "0.95";
       font_family = "JetBrains Mono";
-      font_size = 14;  # Increased for 2x scaling
+      font_size = 12;  # Back to 12 for 1.175x scaling
       enable_audio_bell = false;
-      window_padding_width = 16;  # Increased for 2x scaling
+      window_padding_width = 10;  # Back to 10 for 1.175x scaling
       confirm_os_window_close = 0;
       dynamic_background_opacity = true;
     };
   };
-  
-  # ZSH CONFIGURATION with better prompt
-  programs.zsh = {
-    enable = true;
-    autocd = true;
-    enableAutosuggestions = true;
-    enableCompletion = true;
-    syntaxHighlighting.enable = true;
-    
-    oh-my-zsh = {
-      enable = true;
-      plugins = [ "git" "sudo" "docker" "history" "z" "fzf" ];
-      theme = "robbyrussell";
-    };
-    
-    shellAliases = {
-      ls = "ls --color=auto";
-      ll = "ls -la";
-      la = "ls -la";
-      rebuild = "sudo nixos-rebuild switch";
-      update = "sudo nixos-rebuild switch --upgrade";
-      hm = "home-manager switch";
-      hypr = "Hyprland";
-      ".." = "cd ..";
-      "..." = "cd ../..";
-      grep = "grep --color=auto";
-      cp = "cp -i";
-      mv = "mv -i";
-      rm = "rm -i";
-    };
-    
-    initExtra = ''
-      # Better history
-      setopt HIST_IGNORE_DUPS
-      setopt HIST_IGNORE_ALL_DUPS
-      setopt HIST_REDUCE_BLANKS
-      setopt HIST_SAVE_NO_DUPS
-      setopt SHARE_HISTORY
-      
-      # Auto-completion improvements
-      zstyle ':completion:*' menu select
-      zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
-      
-      # Better directory navigation
-      setopt AUTO_PUSHD
-      setopt PUSHD_IGNORE_DUPS
-    '';
-  };
 
-  # Starship prompt for better terminal experience
-  programs.starship = {
-    enable = true;
-    settings = {
-      format = "$all$character";
-      character = {
-        success_symbol = "[➜](bold green)";
-        error_symbol = "[➜](bold red)";
-      };
-      directory = {
-        truncation_length = 3;
-        style = "bold cyan";
-      };
-      git_branch = {
-        style = "bold purple";
-      };
-      git_status = {
-        style = "bold yellow";
-      };
-    };
-  };
-  
-  # VS CODE CONFIGURATION for 2x scaling
+  # VS CODE CONFIGURATION for 1.175x scaling
   programs.vscode = {
     enable = true;
     extensions = with pkgs.vscode-extensions; [
@@ -246,12 +159,12 @@
     ];
     userSettings = {
       "editor.fontFamily" = "'JetBrains Mono', 'Droid Sans Mono', 'monospace'";
-      "editor.fontSize" = 16;  # Increased for 2x scaling
+      "editor.fontSize" = 13;  # Adjusted for 1.175x scaling
       "editor.fontLigatures" = true;
       "editor.renderWhitespace" = "boundary";
       "editor.minimap.enabled" = false;
       "workbench.colorTheme" = "Dracula";
-      "window.zoomLevel" = 1;  # Increased for 2x scaling
+      "window.zoomLevel" = 0.2;  # Adjusted for 1.175x scaling
       "files.autoSave" = "afterDelay";
       "telemetry.telemetryLevel" = "off";
       "editor.cursorBlinking" = "smooth";
@@ -260,21 +173,8 @@
       "editor.smoothScrolling" = true;
     };
   };
-  
-  # GIT CONFIGURATION
-  programs.git = {
-    enable = true;
-    userName = "dylan";
-    userEmail = "dylan@permuy.me";
-    extraConfig = {
-      init.defaultBranch = "main";
-      pull.rebase = true;
-      push.autoSetupRemote = true;
-      core.editor = "vim";
-    };
-  };
-  
-  # Firefox with better settings for 2x scaling
+
+  # Firefox with better settings for 1.175x scaling
   programs.firefox = {
     enable = true;
     profiles.default = {
@@ -290,8 +190,8 @@
         "privacy.trackingprotection.socialtracking.enabled" = true;
         "dom.security.https_only_mode" = true;
         
-        # UI scaling for 2x
-        "layout.css.devPixelsPerPx" = "2.0";
+        # UI scaling for 1.175x
+        "layout.css.devPixelsPerPx" = "1.175";
         "browser.uidensity" = 1;  # Compact UI
         
         # Better aesthetics
@@ -304,138 +204,98 @@
     };
   };
   
-  # WAYBAR CONFIGURATION for 2x scaling
+  # MODERN WAYBAR CONFIGURATION
   programs.waybar = {
     enable = true;
-    style = ''
-      * {
-        border: none;
-        border-radius: 0;
-        font-family: "JetBrains Mono", "Font Awesome 6 Free";
-        font-size: 16px;  /* Increased for 2x scaling */
-        min-height: 0;
-      }
-
-      window#waybar {
-        background: #282a36;
-        color: #f8f8f2;
-        border-bottom: 2px solid #44475a;
-      }
-
-      #workspaces button {
-        padding: 0 16px;  /* Increased padding */
-        background: #44475a;
-        color: #f8f8f2;
-        border-bottom: 4px solid transparent;  /* Thicker border */
-      }
-
-      #workspaces button.active {
-        background: #bd93f9;
-        border-bottom: 4px solid #ff79c6;
-      }
-
-      #mode, #clock, #battery, #cpu, #memory, #network, #pulseaudio, #tray, #idle_inhibitor, #custom-power, #custom-launcher {
-        padding: 0 16px;  /* Increased padding */
-        margin: 0 8px;    /* Increased margin */
-        background: #44475a;
-        color: #f8f8f2;
-        border-radius: 8px;  /* Increased border radius */
-      }
-
-      #battery.charging {
-        background: #50fa7b;
-        color: #282a36;
-      }
-
-      #battery.critical:not(.charging) {
-        background: #ff5555;
-        color: #f8f8f2;
-        animation: blink 0.5s linear infinite alternate;
-      }
-
-      @keyframes blink {
-        to {
-          background: #f8f8f2;
-          color: #ff5555;
-        }
-      }
-      
-      #custom-power {
-        background: #ff5555;
-        font-size: 18px;  /* Larger power button */
-      }
-      
-      #custom-launcher {
-        background: #50fa7b;
-        color: #282a36;
-        font-size: 18px;  /* Larger launcher button */
-      }
-    '';
-
+    
+    # Use the modern waybar config from the artifact
     settings = {
       mainBar = {
         layer = "top";
         position = "top";
-        height = 40;  # Increased height for 2x scaling
+        height = 35;
+        spacing = 0;
+        margin-top = 5;
+        margin-left = 10;
+        margin-right = 10;
+        
+        modules-left = [
+          "custom/launcher"
+          "hyprland/workspaces" 
+          "hyprland/mode"
+        ];
+        modules-center = [
+          "clock"
+        ];
+        modules-right = [
+          "custom/weather"
+          "pulseaudio"
+          "network"
+          "cpu"
+          "memory"
+          "temperature"
+          "battery"
+          "custom/notification"
+          "tray"
+          "custom/power"
+        ];
 
-        modules-left = ["custom/launcher" "hyprland/workspaces" "hyprland/mode"];
-        modules-center = ["clock"];
-        modules-right = ["pulseaudio" "cpu" "memory" "network" "battery" "tray" "custom/power"];
+        # Module configurations
+        "custom/launcher" = {
+          format = " ";
+          on-click = "wofi --show drun";
+          tooltip = false;
+        };
 
         "hyprland/workspaces" = {
+          disable-scroll = true;
           all-outputs = true;
           format = "{name}";
           format-icons = {
-            "1" = "";
+            "1" = "󰈹";
             "2" = "";
             "3" = "";
-            "4" = "";
-            "5" = "";
-            default = "";
+            "4" = "󰭹";
+            "5" = "󰝚";
+            "6" = "";
+            "7" = "󰒱";
+            "8" = "󰕧";
+            "9" = "󰊖";
+            "10" = "󰽰";
           };
+          on-click = "activate";
+          sort-by-number = true;
+        };
+
+        "hyprland/mode" = {
+          format = "<span style=\"italic\">{}</span>";
+          tooltip = false;
         };
 
         clock = {
-          format = "{:%a, %b %d %H:%M}";
+          timezone = "America/New_York";
+          format = "{:%a %d %b  %I:%M %p}";
+          format-alt = "{:%A, %B %d, %Y (%R)}";
           tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-          format-alt = "{:%Y-%m-%d}";
-        };
-
-        cpu = {
-          format = " {usage}%";
-          tooltip = true;
-          interval = 2;
-        };
-
-        memory = {
-          format = " {}%";
-          interval = 2;
-        };
-        
-        network = {
-          format-wifi = "  {signalStrength}%";
-          format-ethernet = " ";
-          format-disconnected = "⚠ ";
-          tooltip-format = "{ifname}: {ipaddr}/{cidr}";
-          tooltip-format-wifi = "{essid} ({signalStrength}%): {ipaddr}";
-          on-click = "nm-connection-editor";
-        };
-
-        battery = {
-          bat = "BAT0";
-          states = {
-            good = 95;
-            warning = 30;
-            critical = 15;
+          actions = {
+            on-click-right = "mode";
+            on-scroll-up = "shift_up";
+            on-scroll-down = "shift_down";
           };
-          format = "{icon} {capacity}%";
-          format-charging = " {capacity}%";
-          format-icons = ["" "" "" "" ""];
+        };
+
+        "custom/weather" = {
+          format = "{}";
+          tooltip = true;
+          interval = 1800;
+          exec = "curl -s 'https://wttr.in/New+York?format=1' | head -c -1";
+          return-type = "";
         };
 
         pulseaudio = {
+          scroll-step = 5;
           format = "{icon} {volume}%";
-          format-muted = " ";
+          format-muted = "󰖁 Muted";
           format-icons = {
             headphone = "";
             hands-free = "";
@@ -446,135 +306,377 @@
             default = ["" "" ""];
           };
           on-click = "pavucontrol";
+          on-click-right = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+          on-scroll-up = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+";
+          on-scroll-down = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-";
+          tooltip = true;
+          tooltip-format = "Volume: {volume}%";
+        };
+
+        network = {
+          interface = "wlp*";
+          format = "{ifname}";
+          format-wifi = "  {signalStrength}%";
+          format-ethernet = "󰈀 {ipaddr}";
+          format-disconnected = "󰖪 Disconnected";
+          tooltip-format = "{ifname} via {gwaddr} 󰊗";
+          tooltip-format-wifi = "{essid} ({signalStrength}%) 󰤨";
+          tooltip-format-ethernet = "{ifname} 󰈀";
+          tooltip-format-disconnected = "Disconnected";
+          max-length = 50;
+          on-click = "nm-connection-editor";
+        };
+
+        cpu = {
+          interval = 2;
+          format = "󰍛 {usage}%";
+          max-length = 10;
+          on-click = "kitty --class btop -e btop";
+        };
+
+        memory = {
+          interval = 2;
+          format = "󰾆 {percentage}%";
+          tooltip = true;
+          tooltip-format = "Memory: {used:0.1f}G/{total:0.1f}G\nSwap: {swapUsed:0.1f}G/{swapTotal:0.1f}G";
+          on-click = "kitty --class btop -e btop";
+        };
+
+        temperature = {
+          thermal-zone = 2;
+          hwmon-path = "/sys/class/hwmon/hwmon2/temp1_input";
+          critical-threshold = 80;
+          format-critical = "󰸁 {temperatureC}°C";
+          format = "󰔏 {temperatureC}°C";
+          tooltip = true;
+          interval = 2;
+        };
+
+        battery = {
+          bat = "BAT0";
+          adapter = "ADP1";
+          interval = 10;
+          states = {
+            warning = 30;
+            critical = 15;
+          };
+          max-length = 25;
+          format = "{icon} {capacity}%";
+          format-warning = "󰂃 {capacity}%";
+          format-critical = "󰁺 {capacity}%";
+          format-charging = "󰂄 {capacity}%";
+          format-plugged = "󰂄 {capacity}%";
+          format-alt = "{icon} {time}";
+          format-full = "󰁹 {capacity}%";
+          format-icons = ["󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹"];
+          tooltip = true;
+          tooltip-format = "{timeTo}, {capacity}%\n{power}W";
+        };
+
+        "custom/notification" = {
+          tooltip = false;
+          format = "{icon}";
+          format-icons = {
+            notification = "󰂚";
+            none = "󰂛";
+            dnd-notification = "󰂛";
+            dnd-none = "󰂛";
+            inhibited-notification = "󰂛";
+            inhibited-none = "󰂛";
+            dnd-inhibited-notification = "󰂛";
+            dnd-inhibited-none = "󰂛";
+          };
+          return-type = "json";
+          exec-if = "which swaync-client";
+          exec = "swaync-client -swb";
+          on-click = "swaync-client -t -sw";
+          on-click-right = "swaync-client -d -sw";
+          escape = true;
         };
 
         tray = {
-          icon-size = 24;  # Increased for 2x scaling
-          spacing = 16;    # Increased spacing
+          icon-size = 18;
+          spacing = 8;
+          show-passive-items = true;
         };
-        
-        "custom/launcher" = {
-          format = "";
-          on-click = "wofi --show drun";
-          tooltip = false;
-        };
-        
+
         "custom/power" = {
-          format = "";
-          on-click = "wlogout";
+          format = "⏻";
           tooltip = false;
+          on-click = "wlogout";
+          on-click-right = "systemctl poweroff";
         };
       };
     };
-  };
 
-  # WOFI Configuration for 2x scaling
-  programs.wofi = {
-    enable = true;
-    settings = {
-      width = 800;      # Increased for 2x scaling
-      height = 600;     # Increased for 2x scaling
-      location = "center";
-      show = "drun";
-      prompt = "Search...";
-      filter_rate = 100;
-      allow_markup = true;
-      no_actions = true;
-      halign = "fill";
-      orientation = "vertical";
-      content_halign = "fill";
-      insensitive = true;
-      allow_images = true;
-      image_size = 48;  # Increased for 2x scaling
-      gtk_dark = true;
-    };
-    
+    # Use the modern CSS style
     style = ''
-      window {
-        margin: 0px;
-        border: 3px solid #bd93f9;  /* Thicker border */
-        background-color: #282a36;
-        border-radius: 20px;        /* Larger border radius */
-        font-size: 16px;            /* Larger font */
+      /* Import the modern waybar style from the artifact */
+      * {
+          border: none;
+          border-radius: 0;
+          font-family: "JetBrains Mono Nerd Font", "Font Awesome 6 Free", monospace;
+          font-size: 13px;
+          min-height: 0;
+          margin: 0;
+          padding: 0;
       }
 
-      #input {
-        margin: 8px;
-        border: 3px solid #6272a4;
-        background-color: #44475a;
-        color: #f8f8f2;
-        border-radius: 12px;
-        padding: 12px;              /* More padding */
-        font-size: 16px;
+      window#waybar {
+          background: transparent;
+          color: #f8f8f2;
       }
 
-      #inner-box {
-        margin: 8px;
-        background-color: #282a36;
-        color: #f8f8f2;
-        border-radius: 12px;
+      tooltip {
+          background: rgba(40, 42, 54, 0.95);
+          border: 1px solid #6272a4;
+          border-radius: 8px;
+          color: #f8f8f2;
+          font-size: 12px;
       }
 
-      #outer-box {
-        margin: 8px;
-        padding: 16px;              /* More padding */
-        background-color: #282a36;
-        border-radius: 12px;
+      .modules-left,
+      .modules-center,
+      .modules-right {
+          background: rgba(40, 42, 54, 0.85);
+          border-radius: 15px;
+          margin: 0 5px;
+          padding: 0 5px;
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(68, 71, 90, 0.5);
       }
 
-      #scroll {
-        margin: 8px;
-        border: 2px solid #6272a4;
-        background-color: #44475a;
-        border-radius: 12px;
+      .modules-left > widget:first-child > #workspaces,
+      .modules-center > widget > #clock,
+      .modules-right > widget > * {
+          margin: 0 3px;
+          padding: 5px 10px;
+          border-radius: 10px;
+          background: transparent;
+          transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
       }
 
-      #text {
-        margin: 8px;
-        color: #f8f8f2;
-        font-size: 14px;
+      #custom-launcher {
+          color: #50fa7b;
+          font-size: 16px;
+          font-weight: bold;
+          margin-right: 5px;
+          padding: 5px 12px;
       }
 
-      #entry {
-        padding: 8px;               /* More padding for entries */
+      #custom-launcher:hover {
+          background: rgba(80, 250, 123, 0.1);
+          color: #50fa7b;
       }
 
-      #entry:selected {
-        background-color: #44475a;
-        border-radius: 12px;
+      #workspaces {
+          padding: 0;
+          margin: 0;
+          background: transparent;
       }
 
-      #text:selected {
-        color: #ff79c6;
+      #workspaces button {
+          padding: 5px 10px;
+          margin: 0 2px;
+          background: transparent;
+          color: #6272a4;
+          border-radius: 8px;
+          transition: all 0.3s ease;
+          font-size: 14px;
+          min-width: 25px;
+      }
+
+      #workspaces button:hover {
+          background: rgba(98, 114, 164, 0.2);
+          color: #f8f8f2;
+      }
+
+      #workspaces button.active {
+          background: rgba(189, 147, 249, 0.3);
+          color: #bd93f9;
+          font-weight: bold;
+      }
+
+      #workspaces button.urgent {
+          background: rgba(255, 85, 85, 0.3);
+          color: #ff5555;
+          animation: urgent 1s ease-in-out infinite alternate;
+      }
+
+      @keyframes urgent {
+          to {
+              background: rgba(255, 85, 85, 0.5);
+          }
+      }
+
+      #clock {
+          color: #f8f8f2;
+          font-weight: 500;
+          font-size: 14px;
+          padding: 5px 15px;
+      }
+
+      #clock:hover {
+          background: rgba(248, 248, 242, 0.1);
+      }
+
+      #custom-weather {
+          color: #8be9fd;
+          font-weight: 500;
+      }
+
+      #custom-weather:hover {
+          background: rgba(139, 233, 253, 0.1);
+      }
+
+      #pulseaudio {
+          color: #ff79c6;
+      }
+
+      #pulseaudio:hover {
+          background: rgba(255, 121, 198, 0.1);
+      }
+
+      #pulseaudio.muted {
+          color: #6272a4;
+      }
+
+      #network {
+          color: #50fa7b;
+      }
+
+      #network:hover {
+          background: rgba(80, 250, 123, 0.1);
+      }
+
+      #network.disconnected {
+          color: #ff5555;
+      }
+
+      #network.wifi {
+          color: #8be9fd;
+      }
+
+      #network.ethernet {
+          color: #50fa7b;
+      }
+
+      #cpu {
+          color: #ffb86c;
+      }
+
+      #cpu:hover {
+          background: rgba(255, 184, 108, 0.1);
+      }
+
+      #memory {
+          color: #ff79c6;
+      }
+
+      #memory:hover {
+          background: rgba(255, 121, 198, 0.1);
+      }
+
+      #temperature {
+          color: #8be9fd;
+      }
+
+      #temperature:hover {
+          background: rgba(139, 233, 253, 0.1);
+      }
+
+      #temperature.critical {
+          color: #ff5555;
+          animation: temperature-critical 1s ease-in-out infinite alternate;
+      }
+
+      @keyframes temperature-critical {
+          to {
+              background: rgba(255, 85, 85, 0.3);
+          }
+      }
+
+      #battery {
+          color: #50fa7b;
+      }
+
+      #battery:hover {
+          background: rgba(80, 250, 123, 0.1);
+      }
+
+      #battery.charging {
+          color: #f1fa8c;
+          animation: battery-charging 2s ease-in-out infinite alternate;
+      }
+
+      @keyframes battery-charging {
+          to {
+              color: #50fa7b;
+          }
+      }
+
+      #battery.warning:not(.charging) {
+          color: #ffb86c;
+      }
+
+      #battery.critical:not(.charging) {
+          color: #ff5555;
+          animation: battery-critical 1s ease-in-out infinite alternate;
+      }
+
+      @keyframes battery-critical {
+          to {
+              background: rgba(255, 85, 85, 0.3);
+          }
+      }
+
+      #custom-notification {
+          color: #bd93f9;
+          font-size: 16px;
+      }
+
+      #custom-notification:hover {
+          background: rgba(189, 147, 249, 0.1);
+      }
+
+      #tray {
+          background: transparent;
+      }
+
+      #tray > .passive {
+          opacity: 0.5;
+      }
+
+      #tray > .needs-attention {
+          background: rgba(255, 85, 85, 0.3);
+          border-radius: 8px;
+      }
+
+      #custom-power {
+          color: #ff5555;
+          font-size: 16px;
+          font-weight: bold;
+          margin-left: 5px;
+          padding: 5px 12px;
+      }
+
+      #custom-power:hover {
+          background: rgba(255, 85, 85, 0.2);
+          color: #ff5555;
+      }
+
+      #mode {
+          background: rgba(189, 147, 249, 0.3);
+          color: #bd93f9;
+          border-radius: 10px;
+          margin: 0 5px;
+          padding: 5px 15px;
+          font-weight: bold;
       }
     '';
   };
 
-  # Swaylock configuration for better security
-  programs.swaylock = {
-    enable = true;
-    settings = {
-      color = "000000";
-      font-size = 24;
-      indicator-idle-visible = false;
-      indicator-radius = 100;
-      line-color = "ffffff";
-      show-failed-attempts = true;
-      image = "~/.config/hypr/wallpaper.jpg";
-      scaling = "fill";
-    };
-  };
-
-  # Additional XDG configuration
-  xdg = {
-    enable = true;
-    userDirs = {
-      enable = true;
-      createDirectories = true;
-    };
-  };
-
-  # GTK configuration for 2x scaling
+  # GTK configuration for 1.175x scaling
   gtk = {
     enable = true;
     theme = {
@@ -587,66 +689,16 @@
     };
     font = {
       name = "Inter";
-      size = 12;  # Good size for 2x scaling
+      size = 10;  # Adjusted for 1.175x scaling
     };
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
       gtk-cursor-theme-name = "Nordzy-cursors";
-      gtk-cursor-theme-size = 48;
+      gtk-cursor-theme-size = 32;  # Back to 32 for 1.175x
     };
     gtk4.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
       gtk-cursor-theme-name = "Nordzy-cursors";
-      gtk-cursor-theme-size = 48;
+      gtk-cursor-theme-size = 32;  # Back to 32 for 1.175x
     };
   };
-
-  # Qt configuration to match GTK
-  qt = {
-    enable = true;
-    platformTheme.name = "gtk";
-    style.name = "adwaita-dark";
-  };
-
-  # Services for better user experience
-  services = {
-    # Notification daemon
-    swaync = {
-      enable = true;
-      settings = {
-        positionX = "right";
-        positionY = "top";
-        layer = "overlay";
-        control-center-layer = "top";
-        control-center-margin-top = 10;
-        control-center-margin-bottom = 10;
-        control-center-margin-right = 10;
-        control-center-margin-left = 10;
-        notification-2fa-action = true;
-        notification-inline-replies = false;
-        notification-icon-size = 48;  # Larger for 2x scaling
-        notification-body-image-height = 160;
-        notification-body-image-width = 200;
-        timeout = 10;
-        timeout-low = 5;
-        timeout-critical = 0;
-        fit-to-screen = true;
-        control-center-width = 500;  # Larger for 2x scaling
-        control-center-height = 1000;
-        notification-window-width = 400;
-        keyboard-shortcuts = true;
-        image-visibility = "when-available";
-        transition-time = 200;
-        hide-on-clear = false;
-        hide-on-action = true;
-        script-fail-notify = true;
-      };
-    };
-
-    # Clipboard manager
-    cliphist.enable = true;
-  };
-
-  # Basic home configuration version control
-  home.stateVersion = "24.11";
-}
