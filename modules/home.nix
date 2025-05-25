@@ -10,7 +10,7 @@
   # Let Home Manager install and manage itself
   programs.home-manager.enable = true;
   
-  # HYPRLAND CONFIGURATION with 2x scaling
+  # HYPRLAND CONFIGURATION with 2x scaling (FIXED)
   wayland.windowManager.hyprland = {
     enable = true;
     package = hyprland.packages.${pkgs.system}.hyprland;
@@ -42,7 +42,7 @@
         layout = dwindle
       }
 
-      # Decoration settings for 2x scaling
+      # Decoration settings for 2x scaling (REMOVED shadow options)
       decoration {
         rounding = 12
         blur {
@@ -50,10 +50,11 @@
           size = 6
           passes = 2
         }
-        drop_shadow = true
-        shadow_range = 12
-        shadow_render_power = 2
-        col.shadow = rgba(00000044)
+        # Removed deprecated shadow options:
+        # drop_shadow = true
+        # shadow_range = 12
+        # shadow_render_power = 2
+        # col.shadow = rgba(00000044)
       }
 
       # Animation settings
