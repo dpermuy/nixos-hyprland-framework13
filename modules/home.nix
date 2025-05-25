@@ -1,4 +1,8 @@
-# modules/home.nix
+# CSS styling for 1.666667x scaling
+    style = ''
+      * {
+          border: none;
+          border# modules/home.nix
 { config, pkgs, lib, hyprland, ... }:
 
 {
@@ -14,15 +18,15 @@
   # Let Home Manager install and manage itself
   programs.home-manager.enable = true;
 
-  # HYPRLAND CONFIGURATION with 1.175x scaling
+  # HYPRLAND CONFIGURATION with 1.666667x scaling
   wayland.windowManager.hyprland = {
     enable = true;
     package = hyprland.packages.${pkgs.system}.hyprland;
     systemd.enable = true;
     
     extraConfig = ''
-      # Monitor configuration with 1.175x scaling
-      monitor=eDP-1,preferred,auto,1.175
+      # Monitor configuration with 1.666667x scaling
+      monitor=eDP-1,preferred,auto,1.666667
 
       # Input configuration
       input {
@@ -36,23 +40,23 @@
         }
       }
 
-      # General appearance for 1.175x scaling
+      # General appearance for 1.666667x scaling
       general {
-        gaps_in = 5
-        gaps_out = 10
-        border_size = 2
+        gaps_in = 8  # Increased for higher scaling
+        gaps_out = 16  # Increased for higher scaling
+        border_size = 3  # Increased for higher scaling
         col.active_border = rgba(bd93f9ff) rgba(ff79c6ff) 45deg
         col.inactive_border = rgba(44475aff)
         layout = dwindle
       }
 
-      # Decoration settings for 1.175x scaling
+      # Decoration settings for 1.666667x scaling
       decoration {
-        rounding = 10
+        rounding = 15  # Increased for higher scaling
         blur {
           enabled = true
-          size = 3
-          passes = 1
+          size = 5  # Increased for higher scaling
+          passes = 2  # Increased for higher scaling
         }
       }
 
@@ -79,7 +83,7 @@
       exec-once = swaync
       exec-once = nm-applet --indicator
       exec-once = blueman-applet
-      exec-once = hyprctl setcursor Nordzy-cursors 32
+      exec-once = hyprctl setcursor Nordzy-cursors 48
       exec-once = cliphist daemon
 
       # Key bindings
@@ -88,13 +92,13 @@
       bind = SUPER, M, exit
       bind = SUPER, E, exec, thunar
       bind = SUPER, V, togglefloating
-      bind = SUPER, D, exec, env GDK_SCALE=1.175 wofi --show drun
+      bind = SUPER, D, exec, env GDK_SCALE=1.666667 wofi --show drun
       bind = SUPER, F, fullscreen
       bind = SUPER, B, exec, firefox
       bind = SUPER, L, exec, swaylock
       
       # Super key alone opens wofi with proper scaling
-      bindr = SUPER, Super_L, exec, env GDK_SCALE=1.175 wofi --show drun
+      bindr = SUPER, Super_L, exec, env GDK_SCALE=1.666667 wofi --show drun
 
       # Move focus
       bind = SUPER, H, movefocus, l
@@ -137,32 +141,32 @@
       # Clipboard history
       bind = SUPER, C, exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy
 
-      # Environment variables for 1.175x scaling
+      # Environment variables for 1.666667x scaling
       env = XCURSOR_THEME,Nordzy-cursors
-      env = XCURSOR_SIZE,32
+      env = XCURSOR_SIZE,48
       env = WLR_NO_HARDWARE_CURSORS,1
-      env = GDK_SCALE,1.175
-      env = GDK_DPI_SCALE,0.85
+      env = GDK_SCALE,1.666667
+      env = GDK_DPI_SCALE,0.6
       env = MOZ_ENABLE_WAYLAND,1
     '';
   };
   
-  # TERMINAL CONFIGURATION for 1.175x scaling (updated for newer home-manager)
+  # TERMINAL CONFIGURATION for 1.666667x scaling (updated for newer home-manager)
   programs.kitty = {
     enable = true;
     themeFile = "Dracula";
     settings = {
       background_opacity = "0.95";
       font_family = "JetBrains Mono";
-      font_size = 12;
+      font_size = 16;  # Increased for 1.666667x scaling
       enable_audio_bell = false;
-      window_padding_width = 10;
+      window_padding_width = 15;  # Increased for 1.666667x scaling
       confirm_os_window_close = 0;
       dynamic_background_opacity = true;
     };
   };
 
-  # VS CODE CONFIGURATION for 1.175x scaling (updated for newer home-manager)
+  # VS CODE CONFIGURATION for 1.666667x scaling (updated for newer home-manager)
   programs.vscode = {
     enable = true;
     profiles.default = {
@@ -176,12 +180,12 @@
       ];
       userSettings = {
         "editor.fontFamily" = "'JetBrains Mono', 'Droid Sans Mono', 'monospace'";
-        "editor.fontSize" = 13;
+        "editor.fontSize" = 18;  # Increased for 1.666667x scaling
         "editor.fontLigatures" = true;
         "editor.renderWhitespace" = "boundary";
         "editor.minimap.enabled" = false;
         "workbench.colorTheme" = "Dracula";
-        "window.zoomLevel" = 0.2;
+        "window.zoomLevel" = 0.67;  # Adjusted for 1.666667x scaling
         "files.autoSave" = "afterDelay";
         "telemetry.telemetryLevel" = "off";
         "editor.cursorBlinking" = "smooth";
@@ -192,7 +196,7 @@
     };
   };
 
-  # Firefox with better settings for 1.175x scaling
+  # Firefox with better settings for 1.666667x scaling
   programs.firefox = {
     enable = true;
     profiles.default = {
@@ -208,13 +212,15 @@
         "privacy.trackingprotection.socialtracking.enabled" = true;
         "dom.security.https_only_mode" = true;
         
-        # UI scaling for 1.175x - FIXED
-        "layout.css.devPixelsPerPx" = "1.175";
-        "browser.uidensity" = 0;  # Changed from 1 to 0 for normal density
+        # UI scaling for 1.666667x - UPDATED for better scaling
+        "layout.css.devPixelsPerPx" = "1.666667";
+        "browser.uidensity" = 0;  # Normal density
         
-        # Force UI scaling
+        # Force UI scaling for Firefox
+        "widget.gtk.overlay-scrollbars.enabled" = false;
         "browser.display.use_system_colors" = false;
         "widget.use-xdg-desktop-portal.file-picker" = 1;
+        "ui.textScaleFactor" = 167;  # 167% text scaling
         
         # Better aesthetics
         "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
@@ -226,11 +232,11 @@
     };
   };
 
-  # Wofi configuration for better scaling
+  # Wofi configuration for 1.666667x scaling
   home.file.".config/wofi/config".text = ''
-    width=600
-    height=400
-    font=JetBrains Mono 14
+    width=800
+    height=533
+    font=JetBrains Mono 18
     orientation=vertical
     halign=center
     valign=center
@@ -248,63 +254,63 @@
     dpi_aware=true
   '';
 
-  # Create the wofi style with better scaling
+  # Create the wofi style with 1.666667x scaling
   home.file.".config/wofi/style.css".text = ''
     window {
         margin: 0px;
-        border: 2px solid #bd93f9;
+        border: 3px solid #bd93f9;
         background-color: #282a36;
-        border-radius: 15px;
-        font-size: 14px;
+        border-radius: 20px;
+        font-size: 18px;
     }
 
     #input {
-        margin: 5px;
-        border: 2px solid #6272a4;
+        margin: 8px;
+        border: 3px solid #6272a4;
         background-color: #44475a;
         color: #f8f8f2;
-        border-radius: 10px;
-        font-size: 14px;
-        padding: 8px;
+        border-radius: 15px;
+        font-size: 18px;
+        padding: 12px;
     }
 
     #inner-box {
-        margin: 5px;
+        margin: 8px;
         background-color: #282a36;
         color: #f8f8f2;
-        border-radius: 10px;
+        border-radius: 15px;
     }
 
     #outer-box {
-        margin: 5px;
-        padding: 10px;
+        margin: 8px;
+        padding: 15px;
         background-color: #282a36;
-        border-radius: 10px;
+        border-radius: 15px;
     }
 
     #scroll {
-        margin: 5px;
-        border: 2px solid #6272a4;
+        margin: 8px;
+        border: 3px solid #6272a4;
         background-color: #44475a;
-        border-radius: 10px;
+        border-radius: 15px;
     }
 
     #text {
-        margin: 5px;
+        margin: 8px;
         color: #f8f8f2;
-        font-size: 14px;
-        padding: 4px;
+        font-size: 18px;
+        padding: 6px;
     }
 
     #entry {
-        padding: 8px;
-        margin: 2px;
-        min-height: 32px;
+        padding: 12px;
+        margin: 4px;
+        min-height: 48px;
     }
 
     #entry:selected {
         background-color: #44475a;
-        border-radius: 10px;
+        border-radius: 15px;
     }
 
     #text:selected {
@@ -313,7 +319,7 @@
     }
   '';
   
-  # WAYBAR CONFIGURATION
+  # WAYBAR CONFIGURATION for 1.666667x scaling
   programs.waybar = {
     enable = true;
     
@@ -321,11 +327,11 @@
       mainBar = {
         layer = "top";
         position = "top";
-        height = 35;
+        height = 50;  # Increased for 1.666667x scaling
         spacing = 0;
-        margin-top = 5;
-        margin-left = 10;
-        margin-right = 10;
+        margin-top = 8;
+        margin-left = 15;
+        margin-right = 15;
         
         modules-left = [
           "custom/launcher"
@@ -450,13 +456,13 @@
       };
     };
 
-    # CSS styling
+    # CSS styling for 1.666667x scaling
     style = ''
       * {
           border: none;
           border-radius: 0;
           font-family: "JetBrains Mono Nerd Font", "Font Awesome 6 Free", monospace;
-          font-size: 13px;
+          font-size: 16px;  /* Increased for 1.666667x scaling */
           min-height: 0;
           margin: 0;
           padding: 0;
@@ -470,37 +476,37 @@
       tooltip {
           background: rgba(40, 42, 54, 0.95);
           border: 1px solid #6272a4;
-          border-radius: 8px;
+          border-radius: 12px;  /* Increased for 1.666667x scaling */
           color: #f8f8f2;
-          font-size: 12px;
+          font-size: 15px;  /* Increased for 1.666667x scaling */
       }
 
       .modules-left,
       .modules-center,
       .modules-right {
           background: rgba(40, 42, 54, 0.85);
-          border-radius: 15px;
-          margin: 0 5px;
-          padding: 0 5px;
-          border: 1px solid rgba(68, 71, 90, 0.5);
+          border-radius: 20px;  /* Increased for 1.666667x scaling */
+          margin: 0 8px;  /* Increased for 1.666667x scaling */
+          padding: 0 8px;  /* Increased for 1.666667x scaling */
+          border: 2px solid rgba(68, 71, 90, 0.5);  /* Increased for 1.666667x scaling */
       }
 
       .modules-left > widget:first-child > #workspaces,
       .modules-center > widget > #clock,
       .modules-right > widget > * {
-          margin: 0 3px;
-          padding: 5px 10px;
-          border-radius: 10px;
+          margin: 0 5px;  /* Increased for 1.666667x scaling */
+          padding: 8px 15px;  /* Increased for 1.666667x scaling */
+          border-radius: 15px;  /* Increased for 1.666667x scaling */
           background: transparent;
           transition: all 0.3s ease;
       }
 
       #custom-launcher {
           color: #50fa7b;
-          font-size: 16px;
+          font-size: 20px;  /* Increased for 1.666667x scaling */
           font-weight: bold;
-          margin-right: 5px;
-          padding: 5px 12px;
+          margin-right: 8px;  /* Increased for 1.666667x scaling */
+          padding: 8px 18px;  /* Increased for 1.666667x scaling */
       }
 
       #custom-launcher:hover {
@@ -515,14 +521,14 @@
       }
 
       #workspaces button {
-          padding: 5px 10px;
-          margin: 0 2px;
+          padding: 8px 15px;  /* Increased for 1.666667x scaling */
+          margin: 0 3px;  /* Increased for 1.666667x scaling */
           background: transparent;
           color: #6272a4;
-          border-radius: 8px;
+          border-radius: 12px;  /* Increased for 1.666667x scaling */
           transition: all 0.3s ease;
-          font-size: 14px;
-          min-width: 25px;
+          font-size: 17px;  /* Increased for 1.666667x scaling */
+          min-width: 38px;  /* Increased for 1.666667x scaling */
       }
 
       #workspaces button:hover {
@@ -539,8 +545,8 @@
       #clock {
           color: #f8f8f2;
           font-weight: 500;
-          font-size: 14px;
-          padding: 5px 15px;
+          font-size: 17px;  /* Increased for 1.666667x scaling */
+          padding: 8px 20px;  /* Increased for 1.666667x scaling */
       }
 
       #clock:hover {
@@ -617,10 +623,10 @@
 
       #custom-power {
           color: #ff5555;
-          font-size: 16px;
+          font-size: 20px;  /* Increased for 1.666667x scaling */
           font-weight: bold;
-          margin-left: 5px;
-          padding: 5px 12px;
+          margin-left: 8px;  /* Increased for 1.666667x scaling */
+          padding: 8px 18px;  /* Increased for 1.666667x scaling */
       }
 
       #custom-power:hover {
@@ -630,7 +636,7 @@
     '';
   };
 
-  # GTK configuration for 1.175x scaling
+  # GTK configuration for 1.666667x scaling
   gtk = {
     enable = true;
     theme = {
@@ -643,17 +649,17 @@
     };
     font = {
       name = "Inter";
-      size = 10;
+      size = 14;  # Increased for 1.666667x scaling
     };
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
       gtk-cursor-theme-name = "Nordzy-cursors";
-      gtk-cursor-theme-size = 32;
+      gtk-cursor-theme-size = 48;  # Updated for 1.666667x scaling
     };
     gtk4.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
       gtk-cursor-theme-name = "Nordzy-cursors";
-      gtk-cursor-theme-size = 32;
+      gtk-cursor-theme-size = 48;  # Updated for 1.666667x scaling
     };
   };
 }

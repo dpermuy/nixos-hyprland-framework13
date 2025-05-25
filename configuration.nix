@@ -227,43 +227,43 @@ in
   programs.firefox.enable = true;
   nixpkgs.config.allowUnfree = true;
   
-  # Environment variables (enhanced for better scaling)
+  # Environment variables (updated to 1.666667 scaling)
   environment.variables = {
     # Wayland
     MOZ_ENABLE_WAYLAND = "1";
     MOZ_USE_XINPUT2 = "1";
     WLR_NO_HARDWARE_CURSORS = "1";
     
-    # HiDPI settings for 1.175x scaling
-    GDK_SCALE = "1.175"; 
-    GDK_DPI_SCALE = "0.85";
+    # HiDPI settings for 1.666667x scaling (167%)
+    GDK_SCALE = "1.666667"; 
+    GDK_DPI_SCALE = "0.6";  # Adjusted for 1.666667
     QT_AUTO_SCREEN_SCALE_FACTOR = "1";
-    QT_SCALE_FACTOR = "1.175";
-    QT_FONT_DPI = "112";  # Added for better Qt scaling
+    QT_SCALE_FACTOR = "1.666667";
+    QT_FONT_DPI = "160";  # 96 * 1.666667
     
-    # Cursor
+    # Cursor - larger for higher scaling
     XCURSOR_THEME = "Nordzy-cursors";
-    XCURSOR_SIZE = "32";
+    XCURSOR_SIZE = "48";  # Increased from 32 for 1.666667
     
     # Force scaling for problematic apps
-    WINIT_X11_SCALE_FACTOR = "1.175";
-    _JAVA_OPTIONS = "-Dsun.java2d.uiScale=1.175";
+    WINIT_X11_SCALE_FACTOR = "1.666667";
+    _JAVA_OPTIONS = "-Dsun.java2d.uiScale=1.666667";
   };
 
-  # GTK cursor configuration
+  # GTK cursor configuration (updated for 1.666667 scaling)
   environment.etc."gtk-2.0/gtkrc".text = ''
     gtk-cursor-theme-name="Nordzy-cursors"
-    gtk-cursor-theme-size=32
+    gtk-cursor-theme-size=48
   '';
   environment.etc."gtk-3.0/settings.ini".text = ''
     [Settings]
     gtk-cursor-theme-name=Nordzy-cursors
-    gtk-cursor-theme-size=32
+    gtk-cursor-theme-size=48
   '';
   environment.etc."xdg/gtk-3.0/settings.ini".text = ''
     [Settings]
     gtk-cursor-theme-name=Nordzy-cursors
-    gtk-cursor-theme-size=32
+    gtk-cursor-theme-size=48
   '';
 
   # Fonts
