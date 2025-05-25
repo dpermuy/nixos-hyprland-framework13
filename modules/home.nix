@@ -48,10 +48,10 @@
 
       # Decoration settings for 1.6x scaling
       decoration {
-        rounding = 15
+        rounding = 12
         blur {
           enabled = true
-          size = 5
+          size = 4
           passes = 2
         }
       }
@@ -147,22 +147,22 @@
     '';
   };
   
-  # TERMINAL CONFIGURATION for 1.666667x scaling (updated for newer home-manager)
+  # TERMINAL CONFIGURATION for 1.6x scaling (updated for newer home-manager)
   programs.kitty = {
     enable = true;
     themeFile = "Dracula";
     settings = {
       background_opacity = "0.95";
       font_family = "JetBrains Mono";
-      font_size = 16;
+      font_size = 15;  # Adjusted for 1.6x scaling
       enable_audio_bell = false;
-      window_padding_width = 15;
+      window_padding_width = 12;  # Adjusted for 1.6x scaling
       confirm_os_window_close = 0;
       dynamic_background_opacity = true;
     };
   };
 
-  # VS CODE CONFIGURATION for 1.666667x scaling (updated for newer home-manager)
+  # VS CODE CONFIGURATION for 1.6x scaling (updated for newer home-manager)
   programs.vscode = {
     enable = true;
     profiles.default = {
@@ -176,12 +176,12 @@
       ];
       userSettings = {
         "editor.fontFamily" = "'JetBrains Mono', 'Droid Sans Mono', 'monospace'";
-        "editor.fontSize" = 18;
+        "editor.fontSize" = 16;  # Adjusted for 1.6x scaling
         "editor.fontLigatures" = true;
         "editor.renderWhitespace" = "boundary";
         "editor.minimap.enabled" = false;
         "workbench.colorTheme" = "Dracula";
-        "window.zoomLevel" = 0.67;
+        "window.zoomLevel" = 0.5;  # Adjusted for 1.6x scaling
         "files.autoSave" = "afterDelay";
         "telemetry.telemetryLevel" = "off";
         "editor.cursorBlinking" = "smooth";
@@ -192,7 +192,7 @@
     };
   };
 
-  # Firefox with better settings for 1.666667x scaling
+  # Firefox with 67% scaling (reduced from full 1.6x)
   programs.firefox = {
     enable = true;
     profiles.default = {
@@ -208,15 +208,15 @@
         "privacy.trackingprotection.socialtracking.enabled" = true;
         "dom.security.https_only_mode" = true;
         
-        # UI scaling for 1.666667x - UPDATED for better scaling
-        "layout.css.devPixelsPerPx" = "1.666667";
-        "browser.uidensity" = 0;
+        # UI scaling - 67% of 1.6x scaling
+        "layout.css.devPixelsPerPx" = "1.072";  # 67% of 1.6 = 1.072
+        "browser.uidensity" = 1;  # Compact UI for more space
         
         # Force UI scaling for Firefox
         "widget.gtk.overlay-scrollbars.enabled" = false;
         "browser.display.use_system_colors" = false;
         "widget.use-xdg-desktop-portal.file-picker" = 1;
-        "ui.textScaleFactor" = 167;
+        "ui.textScaleFactor" = 107;  # 107% text scaling (67% of 160%)
         
         # Better aesthetics
         "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
@@ -228,11 +228,11 @@
     };
   };
 
-  # Wofi configuration for 1.666667x scaling
+  # Wofi configuration for 1.6x scaling
   home.file.".config/wofi/config".text = ''
-    width=800
-    height=533
-    font=JetBrains Mono 18
+    width=768
+    height=512
+    font=JetBrains Mono 16
     orientation=vertical
     halign=center
     valign=center
@@ -250,14 +250,14 @@
     dpi_aware=true
   '';
 
-  # Create the wofi style with 1.666667x scaling
+  # Create the wofi style with 1.6x scaling
   home.file.".config/wofi/style.css".text = ''
     window {
         margin: 0px;
         border: 3px solid #bd93f9;
         background-color: #282a36;
-        border-radius: 20px;
-        font-size: 18px;
+        border-radius: 18px;
+        font-size: 16px;
     }
 
     #input {
@@ -265,48 +265,48 @@
         border: 3px solid #6272a4;
         background-color: #44475a;
         color: #f8f8f2;
-        border-radius: 15px;
-        font-size: 18px;
-        padding: 12px;
+        border-radius: 12px;
+        font-size: 16px;
+        padding: 10px;
     }
 
     #inner-box {
         margin: 8px;
         background-color: #282a36;
         color: #f8f8f2;
-        border-radius: 15px;
+        border-radius: 12px;
     }
 
     #outer-box {
         margin: 8px;
-        padding: 15px;
+        padding: 12px;
         background-color: #282a36;
-        border-radius: 15px;
+        border-radius: 12px;
     }
 
     #scroll {
         margin: 8px;
         border: 3px solid #6272a4;
         background-color: #44475a;
-        border-radius: 15px;
+        border-radius: 12px;
     }
 
     #text {
         margin: 8px;
         color: #f8f8f2;
-        font-size: 18px;
+        font-size: 16px;
         padding: 6px;
     }
 
     #entry {
-        padding: 12px;
+        padding: 10px;
         margin: 4px;
-        min-height: 48px;
+        min-height: 40px;
     }
 
     #entry:selected {
         background-color: #44475a;
-        border-radius: 15px;
+        border-radius: 12px;
     }
 
     #text:selected {
@@ -315,7 +315,7 @@
     }
   '';
   
-  # WAYBAR CONFIGURATION for 1.666667x scaling
+  # WAYBAR CONFIGURATION for 1.6x scaling
   programs.waybar = {
     enable = true;
     
@@ -323,11 +323,11 @@
       mainBar = {
         layer = "top";
         position = "top";
-        height = 50;
+        height = 45;  # Adjusted for 1.6x scaling
         spacing = 0;
-        margin-top = 8;
-        margin-left = 15;
-        margin-right = 15;
+        margin-top = 6;
+        margin-left = 12;
+        margin-right = 12;
         
         modules-left = [
           "custom/launcher"
@@ -438,8 +438,8 @@
         };
 
         tray = {
-          icon-size = 18;
-          spacing = 8;
+          icon-size = 16;
+          spacing = 6;
           show-passive-items = true;
         };
 
@@ -452,13 +452,13 @@
       };
     };
 
-    # CSS styling for 1.666667x scaling
+    # CSS styling for 1.6x scaling
     style = ''
       * {
           border: none;
           border-radius: 0;
           font-family: "JetBrains Mono Nerd Font", "Font Awesome 6 Free", monospace;
-          font-size: 16px;
+          font-size: 14px;  /* Adjusted for 1.6x scaling */
           min-height: 0;
           margin: 0;
           padding: 0;
@@ -472,37 +472,37 @@
       tooltip {
           background: rgba(40, 42, 54, 0.95);
           border: 1px solid #6272a4;
-          border-radius: 12px;
+          border-radius: 10px;  /* Adjusted for 1.6x scaling */
           color: #f8f8f2;
-          font-size: 15px;
+          font-size: 13px;  /* Adjusted for 1.6x scaling */
       }
 
       .modules-left,
       .modules-center,
       .modules-right {
           background: rgba(40, 42, 54, 0.85);
-          border-radius: 20px;
-          margin: 0 8px;
-          padding: 0 8px;
+          border-radius: 18px;  /* Adjusted for 1.6x scaling */
+          margin: 0 6px;  /* Adjusted for 1.6x scaling */
+          padding: 0 6px;  /* Adjusted for 1.6x scaling */
           border: 2px solid rgba(68, 71, 90, 0.5);
       }
 
       .modules-left > widget:first-child > #workspaces,
       .modules-center > widget > #clock,
       .modules-right > widget > * {
-          margin: 0 5px;
-          padding: 8px 15px;
-          border-radius: 15px;
+          margin: 0 4px;  /* Adjusted for 1.6x scaling */
+          padding: 6px 12px;  /* Adjusted for 1.6x scaling */
+          border-radius: 12px;  /* Adjusted for 1.6x scaling */
           background: transparent;
           transition: all 0.3s ease;
       }
 
       #custom-launcher {
           color: #50fa7b;
-          font-size: 20px;
+          font-size: 18px;  /* Adjusted for 1.6x scaling */
           font-weight: bold;
-          margin-right: 8px;
-          padding: 8px 18px;
+          margin-right: 6px;
+          padding: 6px 15px;
       }
 
       #custom-launcher:hover {
@@ -517,14 +517,14 @@
       }
 
       #workspaces button {
-          padding: 8px 15px;
-          margin: 0 3px;
+          padding: 6px 12px;  /* Adjusted for 1.6x scaling */
+          margin: 0 2px;
           background: transparent;
           color: #6272a4;
-          border-radius: 12px;
+          border-radius: 10px;  /* Adjusted for 1.6x scaling */
           transition: all 0.3s ease;
-          font-size: 17px;
-          min-width: 38px;
+          font-size: 15px;  /* Adjusted for 1.6x scaling */
+          min-width: 32px;  /* Adjusted for 1.6x scaling */
       }
 
       #workspaces button:hover {
@@ -541,8 +541,8 @@
       #clock {
           color: #f8f8f2;
           font-weight: 500;
-          font-size: 17px;
-          padding: 8px 20px;
+          font-size: 15px;  /* Adjusted for 1.6x scaling */
+          padding: 6px 16px;  /* Adjusted for 1.6x scaling */
       }
 
       #clock:hover {
@@ -619,10 +619,10 @@
 
       #custom-power {
           color: #ff5555;
-          font-size: 20px;
+          font-size: 18px;  /* Adjusted for 1.6x scaling */
           font-weight: bold;
-          margin-left: 8px;
-          padding: 8px 18px;
+          margin-left: 6px;
+          padding: 6px 15px;
       }
 
       #custom-power:hover {
@@ -632,7 +632,7 @@
     '';
   };
 
-  # GTK configuration for 1.666667x scaling
+  # GTK configuration for 1.6x scaling
   gtk = {
     enable = true;
     theme = {
@@ -645,17 +645,17 @@
     };
     font = {
       name = "Inter";
-      size = 14;
+      size = 13;  # Adjusted for 1.6x scaling
     };
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
       gtk-cursor-theme-name = "Nordzy-cursors";
-      gtk-cursor-theme-size = 48;
+      gtk-cursor-theme-size = 40;  # Updated for 1.6x scaling
     };
     gtk4.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
       gtk-cursor-theme-name = "Nordzy-cursors";
-      gtk-cursor-theme-size = 48;
+      gtk-cursor-theme-size = 40;  # Updated for 1.6x scaling
     };
   };
 }

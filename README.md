@@ -2,11 +2,11 @@
 
 This is my NixOS config for the Framework 13, AMD Ryzen 5 7640U
 
-**Optimized with 1.666667x (167%) scaling for perfect readability on old Framework 13 3:2 display**
+**Optimized with 1.60x (167%) scaling for perfect readability on old Framework 13 3:2 display**
 
 ```
  _____________________________
-< now with 1.666667x scaling! >
+< now with 1.60 scaling! >
  -----------------------------
         \   ^__^
          \  (oo)\_______
