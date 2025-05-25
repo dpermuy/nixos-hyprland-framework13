@@ -324,7 +324,7 @@ programs.firefox = {
     }
   '';
   
-  # WAYBAR CONFIGURATION scaled down by 25% from 1.6x scaling
+# WAYBAR CONFIGURATION scaled down by 25% from 1.6x scaling
 programs.waybar = {
   enable = true;
   
@@ -426,24 +426,28 @@ programs.waybar = {
       };
 
       battery = {
-        bat = "BAT0";
-        adapter = "ADP1";
+        # Auto-detect battery (works better than specifying BAT0)
+        # bat = "BAT0";
+        # adapter = "ADP1";
         interval = 10;
         states = {
           warning = 30;
           critical = 15;
         };
         max-length = 25;
+        # Enhanced format to ensure percentage is always visible
         format = "{icon} {capacity}%";
         format-warning = "󰂃 {capacity}%";
         format-critical = "󰁺 {capacity}%";
         format-charging = "󰂄 {capacity}%";
         format-plugged = "󰂄 {capacity}%";
-        format-alt = "{icon} {time}";
+        format-alt = "{icon} {time} ({capacity}%)";  # Show percentage even in alt format
         format-full = "󰁹 {capacity}%";
         format-icons = ["󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹"];
         tooltip = true;
         tooltip-format = "{timeTo}, {capacity}%\n{power}W";
+        # Fallback if battery isn't detected
+        format-not-charging = "󰂄 {capacity}%";
       };
 
       tray = {
