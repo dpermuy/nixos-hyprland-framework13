@@ -1,4 +1,20 @@
-# HYPRLAND CONFIGURATION with 1.175x scaling (UPDATED)
+# modules/home.nix
+{ config, pkgs, lib, hyprland, ... }:
+
+{
+  # Home Manager needs a bit of information about you and the paths it should manage
+  home.username = "dylan";
+  home.homeDirectory = "/home/dylan";
+
+  # This value determines the Home Manager release that your configuration is
+  # compatible with. This helps avoid breakage when a new Home Manager release
+  # introduces backwards incompatible changes.
+  home.stateVersion = "24.11";
+
+  # Let Home Manager install and manage itself
+  programs.home-manager.enable = true;
+
+  # HYPRLAND CONFIGURATION with 1.175x scaling
   wayland.windowManager.hyprland = {
     enable = true;
     package = hyprland.packages.${pkgs.system}.hyprland;
@@ -64,7 +80,7 @@
       exec-once = nm-applet --indicator
       exec-once = blueman-applet
       exec-once = hyprctl setcursor Nordzy-cursors 32
-      exec-once = cliphist daemon  # Clipboard history
+      exec-once = cliphist daemon
 
       # Key bindings
       bind = SUPER, Return, exec, kitty
@@ -138,9 +154,9 @@
     settings = {
       background_opacity = "0.95";
       font_family = "JetBrains Mono";
-      font_size = 12;  # Back to 12 for 1.175x scaling
+      font_size = 12;
       enable_audio_bell = false;
-      window_padding_width = 10;  # Back to 10 for 1.175x scaling
+      window_padding_width = 10;
       confirm_os_window_close = 0;
       dynamic_background_opacity = true;
     };
@@ -159,12 +175,12 @@
     ];
     userSettings = {
       "editor.fontFamily" = "'JetBrains Mono', 'Droid Sans Mono', 'monospace'";
-      "editor.fontSize" = 13;  # Adjusted for 1.175x scaling
+      "editor.fontSize" = 13;
       "editor.fontLigatures" = true;
       "editor.renderWhitespace" = "boundary";
       "editor.minimap.enabled" = false;
       "workbench.colorTheme" = "Dracula";
-      "window.zoomLevel" = 0.2;  # Adjusted for 1.175x scaling
+      "window.zoomLevel" = 0.2;
       "files.autoSave" = "afterDelay";
       "telemetry.telemetryLevel" = "off";
       "editor.cursorBlinking" = "smooth";
@@ -192,7 +208,7 @@
         
         # UI scaling for 1.175x
         "layout.css.devPixelsPerPx" = "1.175";
-        "browser.uidensity" = 1;  # Compact UI
+        "browser.uidensity" = 1;
         
         # Better aesthetics
         "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
@@ -204,11 +220,10 @@
     };
   };
   
-  # MODERN WAYBAR CONFIGURATION
+  # WAYBAR CONFIGURATION
   programs.waybar = {
     enable = true;
     
-    # Use the modern waybar config from the artifact
     settings = {
       mainBar = {
         layer = "top";
@@ -222,20 +237,16 @@
         modules-left = [
           "custom/launcher"
           "hyprland/workspaces" 
-          "hyprland/mode"
         ];
         modules-center = [
           "clock"
         ];
         modules-right = [
-          "custom/weather"
           "pulseaudio"
           "network"
           "cpu"
           "memory"
-          "temperature"
           "battery"
-          "custom/notification"
           "tray"
           "custom/power"
         ];
@@ -251,25 +262,8 @@
           disable-scroll = true;
           all-outputs = true;
           format = "{name}";
-          format-icons = {
-            "1" = "󰈹";
-            "2" = "";
-            "3" = "";
-            "4" = "󰭹";
-            "5" = "󰝚";
-            "6" = "";
-            "7" = "󰒱";
-            "8" = "󰕧";
-            "9" = "󰊖";
-            "10" = "󰽰";
-          };
           on-click = "activate";
           sort-by-number = true;
-        };
-
-        "hyprland/mode" = {
-          format = "<span style=\"italic\">{}</span>";
-          tooltip = false;
         };
 
         clock = {
@@ -277,19 +271,6 @@
           format = "{:%a %d %b  %I:%M %p}";
           format-alt = "{:%A, %B %d, %Y (%R)}";
           tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-          actions = {
-            on-click-right = "mode";
-            on-scroll-up = "shift_up";
-            on-scroll-down = "shift_down";
-          };
-        };
-
-        "custom/weather" = {
-          format = "{}";
-          tooltip = true;
-          interval = 1800;
-          exec = "curl -s 'https://wttr.in/New+York?format=1' | head -c -1";
-          return-type = "";
         };
 
         pulseaudio = {
@@ -307,8 +288,6 @@
           };
           on-click = "pavucontrol";
           on-click-right = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
-          on-scroll-up = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+";
-          on-scroll-down = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-";
           tooltip = true;
           tooltip-format = "Volume: {volume}%";
         };
@@ -338,18 +317,8 @@
           interval = 2;
           format = "󰾆 {percentage}%";
           tooltip = true;
-          tooltip-format = "Memory: {used:0.1f}G/{total:0.1f}G\nSwap: {swapUsed:0.1f}G/{swapTotal:0.1f}G";
+          tooltip-format = "Memory: {used:0.1f}G/{total:0.1f}G";
           on-click = "kitty --class btop -e btop";
-        };
-
-        temperature = {
-          thermal-zone = 2;
-          hwmon-path = "/sys/class/hwmon/hwmon2/temp1_input";
-          critical-threshold = 80;
-          format-critical = "󰸁 {temperatureC}°C";
-          format = "󰔏 {temperatureC}°C";
-          tooltip = true;
-          interval = 2;
         };
 
         battery = {
@@ -373,27 +342,6 @@
           tooltip-format = "{timeTo}, {capacity}%\n{power}W";
         };
 
-        "custom/notification" = {
-          tooltip = false;
-          format = "{icon}";
-          format-icons = {
-            notification = "󰂚";
-            none = "󰂛";
-            dnd-notification = "󰂛";
-            dnd-none = "󰂛";
-            inhibited-notification = "󰂛";
-            inhibited-none = "󰂛";
-            dnd-inhibited-notification = "󰂛";
-            dnd-inhibited-none = "󰂛";
-          };
-          return-type = "json";
-          exec-if = "which swaync-client";
-          exec = "swaync-client -swb";
-          on-click = "swaync-client -t -sw";
-          on-click-right = "swaync-client -d -sw";
-          escape = true;
-        };
-
         tray = {
           icon-size = 18;
           spacing = 8;
@@ -409,9 +357,8 @@
       };
     };
 
-    # Use the modern CSS style
+    # CSS styling
     style = ''
-      /* Import the modern waybar style from the artifact */
       * {
           border: none;
           border-radius: 0;
@@ -442,7 +389,6 @@
           border-radius: 15px;
           margin: 0 5px;
           padding: 0 5px;
-          backdrop-filter: blur(20px);
           border: 1px solid rgba(68, 71, 90, 0.5);
       }
 
@@ -453,7 +399,7 @@
           padding: 5px 10px;
           border-radius: 10px;
           background: transparent;
-          transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+          transition: all 0.3s ease;
       }
 
       #custom-launcher {
@@ -497,18 +443,6 @@
           font-weight: bold;
       }
 
-      #workspaces button.urgent {
-          background: rgba(255, 85, 85, 0.3);
-          color: #ff5555;
-          animation: urgent 1s ease-in-out infinite alternate;
-      }
-
-      @keyframes urgent {
-          to {
-              background: rgba(255, 85, 85, 0.5);
-          }
-      }
-
       #clock {
           color: #f8f8f2;
           font-weight: 500;
@@ -518,15 +452,6 @@
 
       #clock:hover {
           background: rgba(248, 248, 242, 0.1);
-      }
-
-      #custom-weather {
-          color: #8be9fd;
-          font-weight: 500;
-      }
-
-      #custom-weather:hover {
-          background: rgba(139, 233, 253, 0.1);
       }
 
       #pulseaudio {
@@ -553,14 +478,6 @@
           color: #ff5555;
       }
 
-      #network.wifi {
-          color: #8be9fd;
-      }
-
-      #network.ethernet {
-          color: #50fa7b;
-      }
-
       #cpu {
           color: #ffb86c;
       }
@@ -577,25 +494,6 @@
           background: rgba(255, 121, 198, 0.1);
       }
 
-      #temperature {
-          color: #8be9fd;
-      }
-
-      #temperature:hover {
-          background: rgba(139, 233, 253, 0.1);
-      }
-
-      #temperature.critical {
-          color: #ff5555;
-          animation: temperature-critical 1s ease-in-out infinite alternate;
-      }
-
-      @keyframes temperature-critical {
-          to {
-              background: rgba(255, 85, 85, 0.3);
-          }
-      }
-
       #battery {
           color: #50fa7b;
       }
@@ -606,13 +504,6 @@
 
       #battery.charging {
           color: #f1fa8c;
-          animation: battery-charging 2s ease-in-out infinite alternate;
-      }
-
-      @keyframes battery-charging {
-          to {
-              color: #50fa7b;
-          }
       }
 
       #battery.warning:not(.charging) {
@@ -621,22 +512,6 @@
 
       #battery.critical:not(.charging) {
           color: #ff5555;
-          animation: battery-critical 1s ease-in-out infinite alternate;
-      }
-
-      @keyframes battery-critical {
-          to {
-              background: rgba(255, 85, 85, 0.3);
-          }
-      }
-
-      #custom-notification {
-          color: #bd93f9;
-          font-size: 16px;
-      }
-
-      #custom-notification:hover {
-          background: rgba(189, 147, 249, 0.1);
       }
 
       #tray {
@@ -645,11 +520,6 @@
 
       #tray > .passive {
           opacity: 0.5;
-      }
-
-      #tray > .needs-attention {
-          background: rgba(255, 85, 85, 0.3);
-          border-radius: 8px;
       }
 
       #custom-power {
@@ -663,15 +533,6 @@
       #custom-power:hover {
           background: rgba(255, 85, 85, 0.2);
           color: #ff5555;
-      }
-
-      #mode {
-          background: rgba(189, 147, 249, 0.3);
-          color: #bd93f9;
-          border-radius: 10px;
-          margin: 0 5px;
-          padding: 5px 15px;
-          font-weight: bold;
       }
     '';
   };
@@ -689,16 +550,17 @@
     };
     font = {
       name = "Inter";
-      size = 10;  # Adjusted for 1.175x scaling
+      size = 10;
     };
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
       gtk-cursor-theme-name = "Nordzy-cursors";
-      gtk-cursor-theme-size = 32;  # Back to 32 for 1.175x
+      gtk-cursor-theme-size = 32;
     };
     gtk4.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
       gtk-cursor-theme-name = "Nordzy-cursors";
-      gtk-cursor-theme-size = 32;  # Back to 32 for 1.175x
+      gtk-cursor-theme-size = 32;
     };
   };
+}

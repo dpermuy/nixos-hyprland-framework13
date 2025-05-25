@@ -10,10 +10,9 @@ let
   };
 in
 {
-  imports =
-    [ # Include the results of the hardware scan and Framework hardware
-      ./hardware-configuration.nix
-    ];
+  imports = [
+    ./hardware-configuration.nix
+  ];
 
   # Bootloader configuration
   boot.loader.systemd-boot.enable = true;
@@ -21,52 +20,42 @@ in
 
   # Framework-specific kernel parameters
   boot.kernelParams = [
-    "amd_pstate=active"   # Better CPU frequency scaling
-    "nvme.noacpi=1"       # Fix potential NVMe issues
-    "acpi_osi=Linux"      # Better ACPI compatibility
-    "acpi_backlight=native" # Better backlight control
+    "amd_pstate=active"
+    "nvme.noacpi=1"
+    "acpi_osi=Linux"
+    "acpi_backlight=native"
   ];
   
-  # Enable AMD virtualization support
   boot.kernelModules = [ "kvm-amd" ];
   
-  # Extra module config for AMD GPU
   boot.extraModprobeConfig = ''
     options amdgpu deep_color=1
     options amdgpu dc=1
     options amdgpu hwmon=1
   '';
 
-  # Networking configuration
-  networking.hostName = "nixos"; # Define your hostname
+  # Networking
+  networking.hostName = "nixos";
   networking.networkmanager.enable = true;
 
-  # Enable experimental Nix features (flakes and nix commands)
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
+  # Nix settings
   nix.settings = {
-  # Increase download buffer
-  download-buffer-size = 10485760;  # 10MB
-  
-  # Use more builders for parallel builds
-  max-jobs = "auto";
-  cores = 0;  # Use all cores
-  
-  # Optimize storage
-  auto-optimise-store = true;
-  
-  # Trust substituter cache
-  trusted-substituters = [
-    "https://cache.nixos.org"
-    "https://nix-community.cachix.org"
-  ];
-  trusted-public-keys = [
-    "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-    "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-  ];
-};
+    experimental-features = [ "nix-command" "flakes" ];
+    download-buffer-size = 10485760;
+    max-jobs = "auto";
+    cores = 0;
+    auto-optimise-store = true;
+    trusted-substituters = [
+      "https://cache.nixos.org"
+      "https://nix-community.cachix.org"
+    ];
+    trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
+  };
 
-  # Time zone and locale settings
+  # Time and locale
   time.timeZone = "America/New_York";
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
@@ -81,19 +70,17 @@ in
     LC_TIME = "en_US.UTF-8";
   };
 
-  # Enable the X11 windowing system and Wayland
+  # Display and desktop
   services.xserver.enable = true;
   
-  # Enable Hyprland Wayland compositor
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
   };
 
-  # Disable KDE Plasma
   services.desktopManager.plasma6.enable = false;
   
-  # SDDM Configuration with minesddm theme
+  # SDDM
   services.displayManager.sddm = {
     enable = true;
     theme = "minesddm";
@@ -106,7 +93,7 @@ in
     };
   };
 
-  # Configure power button behavior
+  # Power management
   services.logind = {
     lidSwitch = "suspend";
     lidSwitchExternalPower = "lock";
@@ -118,33 +105,24 @@ in
     '';
   };
 
-  # Add ACPI event handling
   services.acpid = {
     enable = true;
     handlers = {
       power-button = {
         event = "button/power.*";
         action = "${pkgs.writeShellScript "power-button-action" ''
-          /run/current-system/sw/bin/power-menu
+          ${pkgs.wlogout}/bin/wlogout
         ''}";
       };
     };
   };
   
-  # Framework keyboard function keys support
-  services.udev.extraRules = ''
-    # Framework laptop keyboard function keys
-    SUBSYSTEM=="input", ATTRS{name}=="HPDL0001:00 04F3:324B", ENV{KEYBOARD_KEY_70039}="keyboardbacklightdown"
-    SUBSYSTEM=="input", ATTRS{name}=="HPDL0001:00 04F3:324B", ENV{KEYBOARD_KEY_7003a}="keyboardbacklightup"
-  '';
-  
-  # Configure keymap in X11
+  # Input configuration
   services.xserver.xkb = {
     layout = "us";
     variant = "";
   };
 
-  # Touchpad configuration
   services.libinput = {
     enable = true;
     touchpad = {
@@ -156,7 +134,7 @@ in
     };
   };
   
-  # POWER MANAGEMENT
+  # TLP power management
   services.tlp = {
     enable = true;
     settings = {
@@ -164,37 +142,29 @@ in
       CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
       CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
       CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
-      
-      # AMD-specific settings
       PLATFORM_PROFILE_ON_AC = "performance";
       PLATFORM_PROFILE_ON_BAT = "low-power";
-      
-      # Battery charge thresholds (customize to your preference)
       START_CHARGE_THRESH_BAT0 = 75;
       STOP_CHARGE_THRESH_BAT0 = 90;
     };
   };
   
-  # Better temperature management for AMD
   services.thermald.enable = true;
-  
-  # Enable Power-Profiles-Daemon
   services.power-profiles-daemon.enable = false;
   
-  # Enable CUPS for printing
+  # Printing
   services.printing = {
     enable = true;
     drivers = [ pkgs.gutenprint pkgs.hplip ];
   };
 
-  # Enable network discovery of printers and services
   services.avahi = {
     enable = true;
     nssmdns4 = true;
     openFirewall = true;
   };
   
-  # Enable sound with pipewire
+  # Audio
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -205,7 +175,7 @@ in
     jack.enable = true;
   };
 
-  # Enable bluetooth
+  # Bluetooth
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
@@ -217,20 +187,17 @@ in
     };
   };
   
-  # Enable fingerprint reader (uncomment if you have one)
-  # services.fprintd.enable = true;
-
-  # Configure graphics drivers for AMD
+  # Graphics
   hardware.opengl = {
     enable = true;
     driSupport32Bit = true;
     extraPackages = with pkgs; [
       amdvlk
-      rocmPackages.clr      # This is the ROCm OpenCL runtime
+      rocmPackages.clr
     ];
   };
   
-  # AUTO-UPDATES AND MAINTENANCE
+  # Maintenance
   system.autoUpgrade = {
     enable = true;
     allowReboot = false;
@@ -245,10 +212,9 @@ in
 
   nix.optimise.automatic = true;
   
-  # Enable flatpak for additional applications
   services.flatpak.enable = true;
 
-  # Define a user account
+  # User account
   users.users.dylan = {
     isNormalUser = true;
     description = "dylan";
@@ -258,54 +224,23 @@ in
     ];
   };
   
-  # Install firefox
   programs.firefox.enable = true;
-  
-  # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
   
-  # HiDPI cursor overlay 
-  nixpkgs.overlays = [
-    (final: prev: {
-      gnome = prev.gnome // {
-        adwaita-icon-theme = prev.gnome.adwaita-icon-theme.overrideAttrs (oldAttrs: {
-          postInstall = (oldAttrs.postInstall or "") + ''
-            # Fix cursor sizes for HiDPI displays
-            for size in 24 32 48 64 96; do
-              cd $out/share/icons/Adwaita/''${size}x''${size}/cursors
-              for cursor in *; do
-                if [ -f "$cursor" ]; then
-                  echo "Fixing cursor size for $cursor (''${size}px)"
-                  ${prev.xcursorgen}/bin/xcursorgen -size ''${size} "$cursor" "$cursor.new"
-                  mv "$cursor.new" "$cursor"
-                fi
-              done
-            done
-          '';
-        });
-      };
-    })
-  ];
-
-  # Environment variables for 1.175x scaling (CONSOLIDATED)
+  # Environment variables
   environment.variables = {
-    # Wayland specific
     MOZ_ENABLE_WAYLAND = "1";
     MOZ_USE_XINPUT2 = "1";
     WLR_NO_HARDWARE_CURSORS = "1";
-    
-    # HiDPI settings for 1.175x scaling
     GDK_SCALE = "1.175"; 
     GDK_DPI_SCALE = "0.85";
     QT_AUTO_SCREEN_SCALE_FACTOR = "1";
     QT_SCALE_FACTOR = "1.175";
-    
-    # Cursor configuration back to 32px for 1.175x
     XCURSOR_THEME = "Nordzy-cursors";
     XCURSOR_SIZE = "32";
   };
 
-  # Updated cursor configuration for 1.175x scaling
+  # GTK cursor configuration
   environment.etc."gtk-2.0/gtkrc".text = ''
     gtk-cursor-theme-name="Nordzy-cursors"
     gtk-cursor-theme-size=32
@@ -321,7 +256,7 @@ in
     gtk-cursor-theme-size=32
   '';
 
-  # Font configuration
+  # Fonts
   fonts.packages = with pkgs; [
     font-awesome
     jetbrains-mono
@@ -336,7 +271,7 @@ in
     proggyfonts
   ] ++ builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
   
-  # System packages (CONSOLIDATED - all packages in one place)
+  # System packages
   environment.systemPackages = with pkgs; [
     # Terminal emulators
     kitty
@@ -360,14 +295,14 @@ in
     
     # Applications
     firefox
-    cider  # Music player
+    cider
     steam
     
     # Hyprland-related
-    wofi  # App launcher
-    waybar  # Status bar
-    swaynotificationcenter  # For notifications
-    hyprpaper  # Wallpaper
+    wofi
+    waybar
+    swaynotificationcenter
+    hyprpaper
     
     # Utils
     wget
@@ -375,9 +310,8 @@ in
     htop
     btop
     ripgrep
-    blueman  # Bluetooth manager
-    power-profiles-daemon
-    poweralertd  # Battery notifications
+    blueman
+    poweralertd
     light
     swaylock-effects
     libsForQt5.qt5.qtgraphicaleffects
@@ -435,20 +369,16 @@ in
     libsForQt5.polkit-kde-agent
     
     # Additional utilities
-    swaybg  # For solid color backgrounds
-    imagemagick  # For image manipulation
+    swaybg
+    imagemagick
     neofetch
     pipes
     
-    # Weather script for waybar
+    # Custom scripts
     (pkgs.writeShellScriptBin "waybar-weather" ''
       #!/bin/bash
-      # Simple weather script for waybar
-      location="New+York"  # Change this to your location
-      
-      # Get weather data from wttr.in
+      location="New+York"
       weather=$(curl -s "https://wttr.in/$location?format=1" 2>/dev/null | head -c -1)
-      
       if [ -z "$weather" ]; then
         echo "󰼢 N/A"
       else
@@ -456,10 +386,8 @@ in
       fi
     '')
     
-    # System monitoring script
     (pkgs.writeShellScriptBin "waybar-system" ''
       #!/bin/bash
-      # System info script for waybar tooltips
       case "$1" in
         "cpu")
           echo "CPU: $(nproc) cores"
@@ -474,7 +402,12 @@ in
       esac
     '')
     
-    # SDDM Theme - Sugar Dark as backup
+    # Power menu script
+    (pkgs.writeShellScriptBin "power-menu" ''
+      ${pkgs.wlogout}/bin/wlogout
+    '')
+    
+    # SDDM theme backup
     (pkgs.fetchFromGitHub {
       owner = "MarianArlt";
       repo = "sddm-sugar-dark";
@@ -482,16 +415,11 @@ in
       sha256 = "sha256-C3qB9hFUeuT5+Dos2zFj5SyQegnghpoFV9wHvE9VoD8=";
     })
     
-    # Power button script
-    (pkgs.writeShellScriptBin "power-menu" ''
-      wlogout
-    '')
-    
-    # Additional packages for modern waybar
-    curl  # For weather module
-    jq    # For JSON processing in scripts
+    # Additional packages for waybar
+    jq
+    cliphist
+    brightnessctl
   ];
 
-  # Update stateVersion (keep your original value)
   system.stateVersion = "24.11";
 }
