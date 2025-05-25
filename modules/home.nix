@@ -137,32 +137,32 @@
       font_size = 12;
       enable_audio_bell = false;
       window_padding_width = 10;
-      shell = "zsh"; # If you use zsh
+      shell = "${pkgs.zsh}/bin/zsh";
     };
   };
   
-  # IMPROVED ZSH (uncomment if you want to use zsh)
-  # programs.zsh = {
-  #   enable = true;
-  #   autocd = true;
-  #   enableAutosuggestions = true;
-  #   enableCompletion = true;
-  #   syntaxHighlighting.enable = true;
-  #   
-  #   oh-my-zsh = {
-  #     enable = true;
-  #     plugins = [ "git" "sudo" "docker" "history" ];
-  #     theme = "robbyrussell";
-  #   };
-  #   
-  #   initExtra = ''
-  #     # Useful aliases
-  #     alias ls='ls --color=auto'
-  #     alias ll='ls -la'
-  #     alias rebuild='sudo nixos-rebuild switch'
-  #     alias update='sudo nixos-rebuild switch --upgrade'
-  #   '';
-  # };
+  # ZSH CONFIGURATION
+  programs.zsh = {
+    enable = true;
+    autocd = true;
+    enableAutosuggestions = true;
+    enableCompletion = true;
+    syntaxHighlighting.enable = true;
+    
+    oh-my-zsh = {
+      enable = true;
+      plugins = [ "git" "sudo" "docker" "history" ];
+      theme = "robbyrussell";
+    };
+    
+    initExtra = ''
+      # Useful aliases
+      alias ls='ls --color=auto'
+      alias ll='ls -la'
+      alias rebuild='sudo nixos-rebuild switch'
+      alias update='sudo nixos-rebuild switch --upgrade'
+    '';
+  };
   
   # VS CODE CONFIGURATION
   programs.vscode = {
