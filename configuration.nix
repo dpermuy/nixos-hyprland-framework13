@@ -367,6 +367,9 @@ in
     keepassxc
     syncthing
     font-manager
+    upower
+    acpi
+    lm_sensors
     
     # Screenshot tools
     grim
@@ -426,14 +429,14 @@ in
   
     case "$choice" in
     "󰂄 Battery Status")
-      kitty --class floating-terminal -e bash -c "
-        echo '=== Battery Information ==='
+      kitty --class floating-terminal -e bash -c '
+        echo "=== Battery Information ==="
         upower -i /org/freedesktop/UPower/devices/battery_BAT0
         echo ''
         echo '=== TLP Status ==='
         sudo tlp-stat -b
         read -p 'Press Enter to close...'
-      "
+      '
       ;;
     "⚡ AC Profile")
       sudo tlp ac && notify-send "TLP" "Switched to AC profile (Performance mode)"
