@@ -420,23 +420,21 @@ in
       ${pkgs.wlogout}/bin/wlogout
     '')
 
-    # Power management scripts for TLP
-    (pkgs.writeShellScriptBin "power-menu-battery" ''
-    #!/bin/bash
-    # Interactive power menu for battery management
+    # Power management scripts for TLP (PROPERLY FIXED)
+(pkgs.writeShellScriptBin "power-menu-battery" ''
+  #!/bin/bash
+  choice=$(echo -e "󰂄 Battery Status\n⚡ AC Profile\n🔋 Battery Profile\n⚙️ TLP Settings\n📊 Power Statistics\n🔧 Advanced TLP Config" | wofi --dmenu --prompt "Power Management")
   
-    choice=$(echo -e "󰂄 Battery Status\n⚡ AC Profile\n🔋 Battery Profile\n⚙️ TLP Settings\n📊 Power Statistics\n🔧 Advanced TLP Config" | wofi --dmenu --prompt "Power Management")
-  
-    case "$choice" in
+  case "$choice" in
     "󰂄 Battery Status")
-      kitty --class floating-terminal -e bash -c '
-        echo "=== Battery Information ==="
+      kitty --class floating-terminal -e bash -c "
+        echo '=== Battery Information ==='
         upower -i /org/freedesktop/UPower/devices/battery_BAT0
-        echo ''
+        echo
         echo '=== TLP Status ==='
         sudo tlp-stat -b
         read -p 'Press Enter to close...'
-      '
+      "
       ;;
     "⚡ AC Profile")
       sudo tlp ac && notify-send "TLP" "Switched to AC profile (Performance mode)"
@@ -448,7 +446,7 @@ in
       kitty --class floating-terminal -e bash -c "
         echo '=== Current TLP Configuration ==='
         sudo tlp-stat -c
-        echo ''
+        echo
         read -p 'Press Enter to close...'
       "
       ;;
@@ -456,10 +454,10 @@ in
       kitty --class floating-terminal -e bash -c "
         echo '=== Power Statistics ==='
         sudo tlp-stat -s
-        echo ''
+        echo
         echo '=== Temperature Sensors ==='
         sensors
-        echo ''
+        echo
         read -p 'Press Enter to close...'
       "
       ;;
@@ -467,6 +465,17 @@ in
       $EDITOR /etc/tlp.conf || sudo nano /etc/tlp.conf
       ;;
   esac
+'')
+
+(pkgs.writeShellScriptBin "tlp-toggle-mode" ''
+  #!/bin/bash
+  if acpi -a | grep -q "on-line"; then
+    sudo tlp bat
+    notify-send "TLP" "Forced Battery Profile (Power Saving)" -i battery-caution
+  else
+    sudo tlp ac  
+    notify-send "TLP" "Forced AC Profile (Performance)" -i battery-full-charging
+  fi
 '')
 
 (pkgs.writeShellScriptBin "tlp-toggle-mode" ''
