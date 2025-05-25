@@ -14,15 +14,15 @@
   # Let Home Manager install and manage itself
   programs.home-manager.enable = true;
 
-  # HYPRLAND CONFIGURATION with 1.666667x scaling
+  # HYPRLAND CONFIGURATION with 1.6x scaling
   wayland.windowManager.hyprland = {
     enable = true;
     package = hyprland.packages.${pkgs.system}.hyprland;
     systemd.enable = true;
     
     extraConfig = ''
-      # Monitor configuration with 1.666667x scaling
-      monitor=eDP-1,preferred,auto,1.666667
+      # Monitor configuration with 1.6x scaling
+      monitor=eDP-1,preferred,auto,1.6
 
       # Input configuration
       input {
@@ -36,7 +36,7 @@
         }
       }
 
-      # General appearance for 1.666667x scaling
+      # General appearance for 1.6x scaling
       general {
         gaps_in = 8
         gaps_out = 16
@@ -46,7 +46,7 @@
         layout = dwindle
       }
 
-      # Decoration settings for 1.666667x scaling
+      # Decoration settings for 1.6x scaling
       decoration {
         rounding = 15
         blur {
@@ -79,7 +79,7 @@
       exec-once = swaync
       exec-once = nm-applet --indicator
       exec-once = blueman-applet
-      exec-once = hyprctl setcursor Nordzy-cursors 48
+      exec-once = hyprctl setcursor Nordzy-cursors 40
       exec-once = cliphist daemon
 
       # Key bindings
@@ -88,13 +88,13 @@
       bind = SUPER, M, exit
       bind = SUPER, E, exec, thunar
       bind = SUPER, V, togglefloating
-      bind = SUPER, D, exec, env GDK_SCALE=1.666667 wofi --show drun
+      bind = SUPER, D, exec, env GDK_SCALE=1.6 wofi --show drun
       bind = SUPER, F, fullscreen
       bind = SUPER, B, exec, firefox
       bind = SUPER, L, exec, swaylock
       
       # Super key alone opens wofi with proper scaling
-      bindr = SUPER, Super_L, exec, env GDK_SCALE=1.666667 wofi --show drun
+      bindr = SUPER, Super_L, exec, env GDK_SCALE=1.6 wofi --show drun
 
       # Move focus
       bind = SUPER, H, movefocus, l
@@ -137,12 +137,12 @@
       # Clipboard history
       bind = SUPER, C, exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy
 
-      # Environment variables for 1.666667x scaling
+      # Environment variables for 1.6x scaling
       env = XCURSOR_THEME,Nordzy-cursors
-      env = XCURSOR_SIZE,48
+      env = XCURSOR_SIZE,40
       env = WLR_NO_HARDWARE_CURSORS,1
-      env = GDK_SCALE,1.666667
-      env = GDK_DPI_SCALE,0.6
+      env = GDK_SCALE,1.6
+      env = GDK_DPI_SCALE,0.625
       env = MOZ_ENABLE_WAYLAND,1
     '';
   };
