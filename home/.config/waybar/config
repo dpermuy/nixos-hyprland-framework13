@@ -1,11 +1,9 @@
 {
     "spacing": 0,
-
     "modules-left": [
-        "sway/workspaces",
-        "sway/mode",
-        "sway/scratchpad",
-        "sway/window"
+        "hyprland/workspaces",
+        "hyprland/mode",
+        "hyprland/window"
     ],
     "modules-right": [
         "cpu",
@@ -19,76 +17,125 @@
         "idle_inhibitor",
         "tray"
     ],
-
-    "custom/power": {
-        "format": "goecho",
-        "tooltip-format": "power manager",
-        "on-click": "swaynag -t warning -m 'Power Menu Options' -b 'Shutdown' 'shutdown -h now' -b 'Restart' 'shutdown -r now' -b 'Logout' 'swaymsg exit' -b 'Hibernate' 'systemctl hibernate' --background=#005566 --button-background=#009999 --button-border=#002b33 --border-bottom=#002b33"
+    
+    "hyprland/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": true,
+        "format": "{name}",
+        "on-click": "activate",
+        "sort-by-number": true
     },
-
+    
+    "hyprland/mode": {
+        "format": "<span style=\"italic\">{}</span>",
+        "tooltip": false
+    },
+    
+    "hyprland/window": {
+        "format": "{}",
+        "max-length": 50
+    },
+    
+    "custom/power": {
+        "format": "⏻",
+        "tooltip-format": "power manager",
+        "on-click": "wlogout",
+        "on-click-right": "systemctl poweroff"
+    },
+    
     "clock": {
         "interval": 30,
         "format": "{:%a, %d %b %Y | %H:%M %p}",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
     },
-
+    
     "cpu": {
         "interval": 1,
-        "format": "CPU: {usage}%",
+        "format": "󰍛 {usage}%",
+        "max-length": 10,
+        "on-click": "kitty --class btop -e btop"
     },
-
+    
     "memory": {
         "interval": 1,
-        "format": "Mem:{}%"
+        "format": "󰾆 {percentage}%",
+        "tooltip": true,
+        "tooltip-format": "Memory: {used:0.1f}G/{total:0.1f}G",
+        "on-click": "kitty --class btop -e btop"
     },
-
+    
     "backlight": {
         "format": "{icon} {percent}%",
-        "format-icons": ["🔅", "🔆"]
+        "format-icons": ["🔅", "🔆"],
+        "on-scroll-up": "brightnessctl set 5%+",
+        "on-scroll-down": "brightnessctl set 5%-"
     },
-
+    
     "battery": {
         "states": {
             "warning": 30,
             "critical": 15
         },
-        "interval": 1,
+        "interval": 10,
         "format": "{icon} {capacity}%",
-        "format-charging": "⚡ {capacity}%",
-        "format-icons": ["", "", "", "", ""]
+        "format-charging": "󰂄 {capacity}%",
+        "format-plugged": "󰂄 {capacity}%",
+        "format-alt": "{icon} {time}",
+        "format-full": "󰁹 {capacity}%",
+        "format-icons": ["󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+        "tooltip": true,
+        "tooltip-format": "{timeTo}, {capacity}%"
     },
-
+    
     "network": {
-        "format-wifi": " ({signalStrength}%) {essid}",
-        "format-ethernet": "{ipaddr}/{cidr} ",
-        "tooltip-format": "{ifname} via {gwaddr} ",
-        "format-linked": "{ifname} (No IP) ",
-        "format-disconnected": "Disconnected ⚠"
+        "interface": "wlp*",
+        "format": "{ifname}",
+        "format-wifi": "  {signalStrength}%",
+        "format-ethernet": "󰈀 {ipaddr}",
+        "format-disconnected": "󰖪 Disconnected",
+        "tooltip-format": "{ifname} via {gwaddr} 󰊗",
+        "tooltip-format-wifi": "{essid} ({signalStrength}%) 󰤨",
+        "tooltip-format-ethernet": "{ifname} 󰈀",
+        "tooltip-format-disconnected": "Disconnected",
+        "max-length": 50,
+        "on-click": "nm-connection-editor"
     },
-
+    
     "pulseaudio": {
+        "scroll-step": 5,
         "format": "{icon} {volume}%",
-        "format-bluetooth": "{icon} {volume}%",
-        "format-muted": " {format_source}",
-        "format-source": " {volume}%",
-        "format-source-muted": "",
+        "format-bluetooth": "{icon} {volume}%",
+        "format-muted": "󰖁 Muted",
+        "format-source": " {volume}%",
+        "format-source-muted": "",
         "format-icons": {
-            "headphone": "",
-            "hands-free": "",
-            "default": ["", "", ""]
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
         },
-        "on-click": "pavucontrol"
+        "on-click": "pavucontrol",
+        "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+",
+        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-",
+        "tooltip": true,
+        "tooltip-format": "Volume: {volume}%"
     },
-
+    
     "idle_inhibitor": {
         "format": "{icon}",
         "format-icons": {
-            "activated": "",
-            "deactivated": ""
+            "activated": "󰅶",
+            "deactivated": "󰾪"
         }
     },
-
+    
     "tray": {
-        "spacing": 10
+        "icon-size": 18,
+        "spacing": 8,
+        "show-passive-items": true
     }
 }
