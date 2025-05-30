@@ -1,168 +1,380 @@
-# modules/home.nix
+# Complete enhanced modules/home.nix for Framework 13 AMD
+# Includes performance optimizations, Hyprspace, auto-start btop wallpaper, and gesture support
 { config, pkgs, lib, hyprland, ... }:
 
 {
-  # Home Manager needs a bit of information about you and the paths it should manage
+  # ===== HOME MANAGER BASICS =====
   home.username = "dylan";
   home.homeDirectory = "/home/dylan";
-
-  # This value determines the Home Manager release that your configuration is
-  # compatible with. This helps avoid breakage when a new Home Manager release
-  # introduces backwards incompatible changes.
   home.stateVersion = "24.11";
-
-  # Let Home Manager install and manage itself
   programs.home-manager.enable = true;
 
-  # HYPRLAND CONFIGURATION with 1.6x scaling
+  # ===== HYPRLAND CONFIGURATION =====
   wayland.windowManager.hyprland = {
     enable = true;
     package = hyprland.packages.${pkgs.system}.hyprland;
     systemd.enable = true;
     
     extraConfig = ''
-      # Monitor configuration with 1.6x scaling
+      # ===== MONITOR CONFIGURATION =====
+      # Framework 13 (3:2 aspect ratio) with 1.6x scaling for optimal readability
       monitor=eDP-1,preferred,auto,1.6
 
-      # Input configuration
-      input {
-        kb_layout = us
-        follow_mouse = 1
-        sensitivity = 0
-        touchpad {
-          natural_scroll = true
-          disable_while_typing = true
-          scroll_factor = 0.3
-        }
+      # ===== XWAYLAND SETTINGS =====
+      xwayland {
+          force_zero_scaling = true
       }
 
-      # General appearance for 1.6x scaling
-      general {
-        gaps_in = 8
-        gaps_out = 16
-        border_size = 3
-        col.active_border = rgba(bd93f9ff) rgba(ff79c6ff) 45deg
-        col.inactive_border = rgba(44475aff)
-        layout = dwindle
-      }
-
-      # Decoration settings for 1.6x scaling
-      decoration {
-        rounding = 12
-        blur {
-          enabled = true
-          size = 4
-          passes = 2
-        }
-      }
-
-      # Animation settings
-      animations {
-        enabled = true
-        bezier = myBezier, 0.05, 0.9, 0.1, 1.05
-        animation = windows, 1, 7, myBezier
-        animation = windowsOut, 1, 7, default, popin 80%
-        animation = border, 1, 10, default
-        animation = fade, 1, 7, default
-        animation = workspaces, 1, 6, default
-      }
-
-      # Layout settings
-      dwindle {
-        pseudotile = true
-        preserve_split = true
-      }
-
-      # Autostart applications
-      exec-once = waybar
-      exec-once = hyprpaper
-      exec-once = swaync
-      exec-once = nm-applet --indicator
-      exec-once = blueman-applet
-      exec-once = hyprctl setcursor Nordzy-cursors 40
-      exec-once = cliphist daemon
-
-      # Key bindings
-      bind = SUPER, Return, exec, kitty
-      bind = SUPER, Q, killactive
-      bind = SUPER, M, exit
-      bind = SUPER, E, exec, thunar
-      bind = SUPER, V, togglefloating
-      bind = SUPER, D, exec, env GDK_SCALE=1.6 wofi --show drun
-      bind = SUPER, F, fullscreen
-      bind = SUPER, B, exec, firefox
-      bind = SUPER, L, exec, swaylock
-      
-      # Super key alone opens wofi with proper scaling
-      bindr = SUPER, Super_L, exec, env GDK_SCALE=1.6 wofi --show drun
-
-      # Move focus
-      bind = SUPER, H, movefocus, l
-      bind = SUPER, L, movefocus, r
-      bind = SUPER, K, movefocus, u
-      bind = SUPER, J, movefocus, d
-
-      # Switch workspaces
-      bind = SUPER, 1, workspace, 1
-      bind = SUPER, 2, workspace, 2
-      bind = SUPER, 3, workspace, 3
-      bind = SUPER, 4, workspace, 4
-      bind = SUPER, 5, workspace, 5
-
-      # Move active window to workspace
-      bind = SUPER SHIFT, 1, movetoworkspace, 1
-      bind = SUPER SHIFT, 2, movetoworkspace, 2
-      bind = SUPER SHIFT, 3, movetoworkspace, 3
-      bind = SUPER SHIFT, 4, movetoworkspace, 4
-      bind = SUPER SHIFT, 5, movetoworkspace, 5
-
-      # Mouse bindings
-      bindm = SUPER, mouse:272, movewindow
-      bindm = SUPER, mouse:273, resizewindow
-
-      # Volume control
-      bind = , XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
-      bind = , XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
-      bind = , XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
-
-      # Brightness control - Framework 13 F7/F8
-      bind = , F7, exec, brightnessctl set 5%-
-      bind = , F8, exec, brightnessctl set 5%+
-      bind = , XF86MonBrightnessDown, exec, brightnessctl set 5%-
-      bind = , XF86MonBrightnessUp, exec, brightnessctl set 5%+
-
-      # Power button
-      bind = , XF86PowerOff, exec, wlogout
-      
-      # Clipboard history
-      bind = SUPER, C, exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy
-
-      # Environment variables for 1.6x scaling
+      # ===== ENVIRONMENT VARIABLES =====
       env = XCURSOR_THEME,Nordzy-cursors
       env = XCURSOR_SIZE,40
       env = WLR_NO_HARDWARE_CURSORS,1
       env = GDK_SCALE,1.6
       env = GDK_DPI_SCALE,0.625
+      env = QT_AUTO_SCREEN_SCALE_FACTOR,1
+      env = QT_SCALE_FACTOR,1.6
       env = MOZ_ENABLE_WAYLAND,1
+
+      # ===== INPUT CONFIGURATION =====
+      input {
+          kb_layout = us
+          follow_mouse = 1
+          sensitivity = 0
+          accel_profile = flat
+
+          touchpad {
+              natural_scroll = true
+              disable_while_typing = true
+              clickfinger_behavior = true
+              tap-to-click = false
+              scroll_factor = 0.3
+              drag_lock = false
+              tap-and-drag = false
+          }
+      }
+
+      # ===== GENERAL APPEARANCE =====
+      general {
+          gaps_in = 8
+          gaps_out = 16
+          border_size = 3
+          col.active_border = rgba(bd93f9ff) rgba(ff79c6ff) 45deg
+          col.inactive_border = rgba(44475aff)
+          layout = dwindle
+          
+          # Performance optimizations - updated for newer Hyprland
+          resize_on_border = true
+          extend_border_grab_area = 5
+      }
+
+      # ===== DECORATION (OPTIMIZED FOR PERFORMANCE) =====
+      decoration {
+          rounding = 10
+          
+          blur {
+              enabled = true
+              size = 3
+              passes = 1
+              new_optimizations = true
+              xray = false
+              ignore_opacity = false
+              noise = 0.0117
+              contrast = 0.8916
+              brightness = 0.8172
+          }
+          
+          # Shadow settings - updated syntax
+          shadow {
+              enabled = false
+          }
+      }
+
+      # ===== OPTIMIZED ANIMATIONS (70% FASTER) =====
+      animations {
+          enabled = true
+          
+          # Fast, snappy bezier curves
+          bezier = overshot, 0.13, 0.99, 0.29, 1.1
+          bezier = smoothOut, 0.36, 0, 0.66, -0.56
+          bezier = smoothIn, 0.25, 1, 0.5, 1
+          bezier = realsmooth, 0.28, 0.29, 0.69, 1.08
+          
+          # Much faster animations for snappy feel
+          animation = windows, 1, 3, overshot, slide
+          animation = windowsOut, 1, 2, smoothOut, slide
+          animation = windowsMove, 1, 2, smoothIn, slide
+          animation = border, 1, 5, default
+          animation = borderangle, 1, 5, default
+          animation = fade, 1, 3, smoothIn
+          animation = fadeDim, 1, 3, smoothIn
+          animation = workspaces, 1, 3, realsmooth, slide
+          animation = specialWorkspace, 1, 3, realsmooth, slidevert
+          animation = layers, 1, 2, overshot, slide
+      }
+
+      # ===== LAYOUT SETTINGS =====
+      dwindle {
+          pseudotile = true
+          preserve_split = true
+          force_split = 0
+          split_width_multiplier = 1.0
+          use_active_for_splits = true
+      }
+
+      # ===== PERFORMANCE AND BEHAVIOR =====
+      misc {
+          disable_hyprland_logo = true
+          disable_splash_rendering = true
+          mouse_move_enables_dpms = true
+          key_press_enables_dpms = true
+          animate_manual_resizes = true
+          animate_mouse_windowdragging = true
+          enable_swallow = true
+          swallow_regex = ^(kitty)$
+          focus_on_activate = false
+          force_default_wallpaper = 0
+          vfr = true
+      }
+
+      # ===== HYPRSPACE PLUGIN CONFIGURATION =====
+      plugin:hyprspace {
+          # Overview settings optimized for Framework 13
+          overview_gappo = 60
+          overview_gappi = 24
+          workspaces_per_row = 3
+          overview_scale = 0.3
+          
+          # Fast animations
+          anim_duration = 0.2
+          
+          # Behavior
+          overview_center_1 = true
+          overview_only_search_visible = true
+          
+          # Dracula theme colors
+          overview_bg_color = rgba(40, 42, 54, 0.85)
+          overview_border_color = rgba(189, 147, 249, 1)
+          overview_border_inactive_color = rgba(68, 71, 90, 1)
+      }
+
+      # ===== AUTOSTART APPLICATIONS =====
+      exec-once = waybar
+      exec-once = hyprpaper
+      exec-once = swaync
+      exec-once = nm-applet --indicator
+      exec-once = blueman-applet
+      exec-once = cliphist daemon
+      exec-once = libinput-gestures
+      
+      # Set cursor theme and size
+      exec-once = hyprctl setcursor Nordzy-cursors 40
+      
+      # AUTO-START BTOP WALLPAPER (with longer delay for debugging)
+      exec-once = sleep 8 && btop-wallpaper-autostart
+
+      # ===== KEY BINDINGS =====
+      # Basic window management
+      bind = SUPER, Return, exec, kitty
+      bind = SUPER, Q, killactive
+      bind = SUPER, M, exit
+      bind = SUPER, E, exec, thunar
+      bind = SUPER, V, togglefloating
+      bind = SUPER, F, fullscreen
+      bind = SUPER, B, exec, firefox
+
+      # Application launcher (optimized Wofi)
+      bind = SUPER, D, exec, env GDK_SCALE=1.6 wofi --show drun
+      bindr = SUPER, Super_L, exec, env GDK_SCALE=1.6 wofi --show drun
+
+      # Hyprspace workspace overview - updated dispatcher syntax
+      bind = SUPER, Space, exec, hyprctl dispatch hyprspace:toggleoverview
+      bind = SUPER ALT, Space, exec, hyprctl dispatch hyprspace:toggleoverview
+
+      # Btop wallpaper management
+      bind = SUPER SHIFT, B, exec, btop-wallpaper toggle
+      bind = SUPER CTRL, B, exec, btop-wallpaper start corner
+
+      # Window focus (vim-style)
+      bind = SUPER, H, movefocus, l
+      bind = SUPER, L, movefocus, r
+      bind = SUPER, K, movefocus, u
+      bind = SUPER, J, movefocus, d
+
+      # Move windows (vim-style)
+      bind = SUPER SHIFT, H, movewindow, l
+      bind = SUPER SHIFT, L, movewindow, r
+      bind = SUPER SHIFT, K, movewindow, u
+      bind = SUPER SHIFT, J, movewindow, d
+
+      # Resize windows (vim-style + ALT)
+      bind = SUPER ALT, H, resizeactive, -25 0
+      bind = SUPER ALT, L, resizeactive, 25 0
+      bind = SUPER ALT, K, resizeactive, 0 -25
+      bind = SUPER ALT, J, resizeactive, 0 25
+
+      # Workspace switching
+      bind = SUPER, 1, workspace, 1
+      bind = SUPER, 2, workspace, 2
+      bind = SUPER, 3, workspace, 3
+      bind = SUPER, 4, workspace, 4
+      bind = SUPER, 5, workspace, 5
+      bind = SUPER, 6, workspace, 6
+      bind = SUPER, 7, workspace, 7
+      bind = SUPER, 8, workspace, 8
+      bind = SUPER, 9, workspace, 9
+      bind = SUPER, 0, workspace, 10
+
+      # Move windows to workspaces
+      bind = SUPER SHIFT, 1, movetoworkspace, 1
+      bind = SUPER SHIFT, 2, movetoworkspace, 2
+      bind = SUPER SHIFT, 3, movetoworkspace, 3
+      bind = SUPER SHIFT, 4, movetoworkspace, 4
+      bind = SUPER SHIFT, 5, movetoworkspace, 5
+      bind = SUPER SHIFT, 6, movetoworkspace, 6
+      bind = SUPER SHIFT, 7, movetoworkspace, 7
+      bind = SUPER SHIFT, 8, movetoworkspace, 8
+      bind = SUPER SHIFT, 9, movetoworkspace, 9
+      bind = SUPER SHIFT, 0, movetoworkspace, 10
+
+      # Mouse bindings
+      bindm = SUPER, mouse:272, movewindow
+      bindm = SUPER, mouse:273, resizewindow
+
+      # Audio control
+      bind = , XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+      bind = , XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+      bind = , XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+
+      # Framework 13 F-key audio controls
+      bind = , F1, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+      bind = , F2, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+      bind = , F3, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+
+      # Brightness control
+      bind = , XF86MonBrightnessDown, exec, brightnessctl set 5%-
+      bind = , XF86MonBrightnessUp, exec, brightnessctl set 5%+
+      bind = , F7, exec, brightnessctl set 5%-
+      bind = , F8, exec, brightnessctl set 5%+
+
+      # Power and session management
+      bind = , XF86PowerOff, exec, wlogout
+      bind = SUPER CTRL, L, exec, swaylock
+      bind = SUPER SHIFT, Q, exec, wlogout
+
+      # Screenshots
+      bind = , Print, exec, grim -g "$(slurp)" - | wl-copy
+      bind = SHIFT, Print, exec, grim - | wl-copy
+      bind = SUPER SHIFT, S, exec, grim -g "$(slurp)" ~/Pictures/Screenshots/screenshot-$(date +%Y-%m-%d_%H-%M-%S).png
+
+      # Clipboard history
+      bind = SUPER, C, exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy
+
+      # ===== WINDOW RULES =====
+      # Floating windows
+      windowrule = float, ^(pavucontrol)$
+      windowrule = float, ^(blueman-manager)$
+      windowrule = float, ^(nm-connection-editor)$
+      windowrule = float, ^(file-roller)$
+      windowrule = float, title:^(Picture-in-Picture)$
+      windowrule = float, ^(org.gnome.Calculator)$
+      windowrule = float, ^(org.gnome.Characters)$
+      windowrule = float, ^(org.gnome.clocks)$
+
+      # Window sizing
+      windowrule = size 800 600, ^(pavucontrol)$
+      windowrule = center, ^(pavucontrol)$
+      windowrule = size 60% 60%, title:^(Picture-in-Picture)$
+      windowrule = move 39% 39%, title:^(Picture-in-Picture)$
+
+      # Btop wallpaper specific rules
+      windowrulev2 = float, class:(btop-wallpaper)
+      windowrulev2 = pin, class:(btop-wallpaper)
+      windowrulev2 = nofocus, class:(btop-wallpaper)
+      windowrulev2 = noborder, class:(btop-wallpaper)
+      windowrulev2 = noshadow, class:(btop-wallpaper)
+      windowrulev2 = opacity 0.8, class:(btop-wallpaper)
+
+      # Power management window rules
+      windowrule = float, ^(floating-terminal)$
+      windowrule = size 800 600, ^(floating-terminal)$
+      windowrule = center, ^(floating-terminal)$
+
+      # Workspace assignments
+      windowrule = workspace 2, ^(firefox)$
+      windowrule = workspace 3, ^(code)$
+      windowrule = workspace 4, ^(discord)$
+
+      # Performance rules
+      windowrulev2 = immediate, class:(steam_app_*)
+      windowrulev2 = immediate, class:(lutris)
+      windowrulev2 = immediate, class:(bottles)
+
+      # Transparency
+      windowrulev2 = opacity 0.95, class:(kitty)
+      windowrulev2 = opacity 0.95, class:(thunar)
+      windowrulev2 = opacity 0.9, class:(wofi)
     '';
   };
-  
-  # TERMINAL CONFIGURATION for 1.6x scaling (updated for newer home-manager)
+
+  # ===== GESTURE CONFIGURATION =====
+  home.file.".config/libinput-gestures.conf".text = ''
+    # Gesture configuration for Framework 13 touchpad
+    
+    # Three finger swipe up/down - Hyprspace toggle
+    gesture: swipe up 3 hyprctl dispatch hyprspace:toggleoverview
+    gesture: swipe down 3 hyprctl dispatch hyprspace:toggleoverview
+    
+    # Four finger workspace switching
+    gesture: swipe left 4 hyprctl dispatch workspace +1
+    gesture: swipe right 4 hyprctl dispatch workspace -1
+    
+    # Three finger browser navigation
+    gesture: swipe left 3 xdotool key alt+Right
+    gesture: swipe right 3 xdotool key alt+Left
+    
+    # Four finger pinch for overview (alternative)
+    gesture: pinch in 4 hyprctl dispatch hyprspace:toggleoverview
+    gesture: pinch out 4 hyprctl dispatch hyprspace:toggleoverview
+    
+    # Configuration settings
+    swipe_threshold: 0.6
+    timeout: 300
+    
+    # Device-specific tuning for Framework 13
+    device: PIXA3854:00 093A:0274 Touchpad
+  '';
+
+  # ===== TERMINAL CONFIGURATION =====
   programs.kitty = {
     enable = true;
     themeFile = "Dracula";
     settings = {
+      # Visual settings
       background_opacity = "0.95";
       font_family = "JetBrains Mono";
-      font_size = 15;  # Adjusted for 1.6x scaling
+      font_size = 15;
+      window_padding_width = 12;
+      
+      # Performance optimizations
+      repaint_delay = 8;
+      input_delay = 2;
+      sync_to_monitor = true;
       enable_audio_bell = false;
-      window_padding_width = 12;  # Adjusted for 1.6x scaling
       confirm_os_window_close = 0;
       dynamic_background_opacity = true;
+      
+      # Animation settings
+      window_resize_step_cells = 2;
+      window_resize_step_lines = 2;
+      
+      # Additional optimizations
+      scrollback_lines = 2000;
+      wheel_scroll_multiplier = 3.0;
+      touch_scroll_multiplier = 1.0;
     };
   };
 
-  # VS CODE CONFIGURATION for 1.6x scaling (updated for newer home-manager)
+  # ===== VS CODE CONFIGURATION =====
   programs.vscode = {
     enable = true;
     profiles.default = {
@@ -173,255 +385,234 @@
         bbenoist.nix
         ms-vscode.hexeditor
         ms-python.python
+        ms-vscode.cpptools
+        bradlc.vscode-tailwindcss
       ];
       userSettings = {
-        "editor.fontFamily" = "'JetBrains Mono', 'Droid Sans Mono', 'monospace'";
-        "editor.fontSize" = 16;  # Adjusted for 1.6x scaling
+        # Font and display
+        "editor.fontFamily" = "'JetBrains Mono', 'Droid Sans Mono', monospace";
+        "editor.fontSize" = 16;
         "editor.fontLigatures" = true;
-        "editor.renderWhitespace" = "boundary";
-        "editor.minimap.enabled" = false;
+        "editor.lineHeight" = 1.4;
+        
+        # Theme and UI
         "workbench.colorTheme" = "Dracula";
-        "window.zoomLevel" = 0.5;  # Adjusted for 1.6x scaling
+        "window.zoomLevel" = 0.5;
+        "editor.minimap.enabled" = false;
+        "workbench.activityBar.location" = "top";
+        
+        # Performance optimizations
+        "editor.accessibilitySupport" = "off";
+        "extensions.autoUpdate" = false;
+        "search.followSymlinks" = false;
+        "search.useRipgrep" = true;
+        "editor.semanticHighlighting.enabled" = false;
+        
+        # File watching exclusions
+        "files.watcherExclude" = {
+          "**/.git/objects/**" = true;
+          "**/.git/subtree-cache/**" = true;
+          "**/node_modules/*/**" = true;
+          "**/.hg/store/**" = true;
+          "**/target/**" = true;
+          "**/.next/**" = true;
+        };
+        
+        # Editor behavior
+        "editor.renderWhitespace" = "boundary";
         "files.autoSave" = "afterDelay";
-        "telemetry.telemetryLevel" = "off";
         "editor.cursorBlinking" = "smooth";
         "editor.cursorSmoothCaretAnimation" = "on";
         "workbench.list.smoothScrolling" = true;
         "editor.smoothScrolling" = true;
+        
+        # Privacy
+        "telemetry.telemetryLevel" = "off";
+        "workbench.enableExperiments" = false;
       };
     };
   };
 
-  # Firefox with improved scaling (33% bigger than current)
-programs.firefox = {
-  enable = true;
-  profiles.default = {
-    name = "Default";
-    settings = {
-      # Performance settings
-      "gfx.webrender.all" = true;
-      "media.ffmpeg.vaapi.enabled" = true;
-      "media.ffvpx.enabled" = false;
-      
-      # Privacy settings
-      "privacy.trackingprotection.enabled" = true;
-      "privacy.trackingprotection.socialtracking.enabled" = true;
-      "dom.security.https_only_mode" = true;
-      
-      # UI scaling - Increased by 33% from previous 1.072
-      "layout.css.devPixelsPerPx" = "1.426";  # 1.072 * 1.33 = 1.426
-      "browser.uidensity" = 0;  # Changed from 1 (compact) to 0 (normal) for larger UI elements
-      
-      # Force UI scaling for Firefox
-      "widget.gtk.overlay-scrollbars.enabled" = false;
-      "browser.display.use_system_colors" = false;
-      "widget.use-xdg-desktop-portal.file-picker" = 1;
-      "ui.textScaleFactor" = 143;  # Increased from 107 to 143 (33% bigger)
-      
-      # Better aesthetics
-      "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-      "browser.tabs.loadInBackground" = true;
-      "browser.urlbar.suggest.bookmark" = true;
-      "browser.urlbar.suggest.history" = true;
-      "browser.urlbar.suggest.openpage" = true;
-      
-      # Additional scaling improvements
-      "browser.chrome.site_icons" = true;
-      "browser.chrome.favicons" = true;
-      "security.dialog_enable_delay" = 0;
-      
-      # Ensure proper DPI awareness
-      "layout.css.dpi" = 154;  # 96 * 1.6 (your system scaling)
-      "browser.zoom.full" = true;  # Enable full page zoom instead of text-only
+  # ===== FIREFOX CONFIGURATION =====
+  programs.firefox = {
+    enable = true;
+    profiles.default = {
+      name = "Default";
+      settings = {
+        # Performance settings
+        "gfx.webrender.all" = true;
+        "media.ffmpeg.vaapi.enabled" = true;
+        "media.ffvpx.enabled" = false;
+        "gfx.canvas.accelerated.cache-items" = 4096;
+        "gfx.canvas.accelerated.cache-size" = 512;
+        "gfx.content.skia-font-cache-size" = 20;
+        
+        # Privacy settings
+        "privacy.trackingprotection.enabled" = true;
+        "privacy.trackingprotection.socialtracking.enabled" = true;
+        "dom.security.https_only_mode" = true;
+        
+        # Scaling optimized for Framework 13
+        "layout.css.devPixelsPerPx" = "1.426";
+        "browser.uidensity" = 0;
+        "ui.textScaleFactor" = 143;
+        
+        # Performance optimizations
+        "browser.cache.disk.enable" = true;
+        "browser.cache.memory.enable" = true;
+        "browser.cache.memory.capacity" = 204800;
+        "network.http.max-connections" = 1800;
+        "network.http.max-persistent-connections-per-server" = 10;
+        "browser.tabs.animate" = false;
+        "browser.fullscreen.animate" = false;
+        "browser.panorama.animate_zoom" = false;
+        
+        # Scrolling improvements
+        "general.smoothScroll" = true;
+        "general.smoothScroll.lines.durationMaxMS" = 125;
+        "general.smoothScroll.lines.durationMinMS" = 125;
+        "general.smoothScroll.mouseWheel.durationMaxMS" = 200;
+        "general.smoothScroll.mouseWheel.durationMinMS" = 100;
+        
+        # Additional optimizations
+        "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+        "browser.tabs.loadInBackground" = true;
+        "browser.urlbar.suggest.bookmark" = true;
+        "browser.urlbar.suggest.history" = true;
+        "browser.urlbar.suggest.openpage" = true;
+        "layout.css.dpi" = 154;
+        "browser.zoom.full" = true;
+      };
     };
   };
-};
 
-   # Modern Wofi configuration with icons and Dracula theme
+  # ===== WOFI CONFIGURATION (PERFORMANCE OPTIMIZED) =====
   home.file.".config/wofi/config".text = ''
-    # Modern Wofi Configuration for Framework 13 with 1.6x scaling
-    # Window dimensions - larger for better icon display
-    width=700
-    height=500
-
-    # Layout settings
+    # Performance-optimized Wofi for Framework 13
+    width=600
+    height=400
     show=drun
     mode=drun
     allow_images=true
-    image_size=48
+    image_size=32
     columns=2
     orientation=vertical
-
-    # Positioning
     location=center
     halign=fill
     valign=center
-
-    # Font and text
-    font=JetBrains Mono 14
-    prompt=Search Applications...
-
-    # Behavior
-    filter_rate=100
-    allow_markup=true
+    font=JetBrains Mono 12
+    prompt=Apps
+    filter_rate=50
+    allow_markup=false
     no_actions=true
     show_all=false
     print_command=true
     layer=overlay
     insensitive=true
-    matching=fuzzy
-
-    # Performance and caching
+    matching=contains
     cache_file=/home/dylan/.cache/wofi-drun
     gtk_dark=true
-    dpi_aware=true
-
-    # Enable proper icon support
+    dpi_aware=false
     normal_window=false
     term=kitty
-
-    # Key bindings
+    exec_search=false
     key_expand=Tab
     key_exit=Escape
+    cache_timeout=86400
+    sort_order=alphabetical
+    hide_scroll=true
+    dynamic_lines=false
+    parse_search=false
+    single_click=true
   '';
 
-  # Modern wofi style with glassmorphism and Dracula colors
   home.file.".config/wofi/style.css".text = ''
-    /* Modern Wofi Style with Dracula Colors and Icons */
     * {
-        font-family: "JetBrains Mono", "Font Awesome 6 Free", monospace;
+        font-family: "JetBrains Mono", monospace;
         font-weight: 500;
+        font-size: 12px;
     }
 
-    /* Main window with glassmorphism effect */
     window {
         margin: 0px;
-        border-radius: 20px;
-        background: linear-gradient(135deg, 
-            rgba(40, 42, 54, 0.95) 0%, 
-            rgba(68, 71, 90, 0.9) 100%);
+        border-radius: 15px;
+        background: rgba(40, 42, 54, 0.95);
         border: 2px solid rgba(189, 147, 249, 0.3);
-        backdrop-filter: blur(10px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        animation: fadeIn 0.2s ease-out;
+        animation: fadeIn 0.1s ease-out;
     }
 
     @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: scale(0.95);
-        }
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
+        from { opacity: 0; transform: scale(0.98); }
+        to { opacity: 1; transform: scale(1); }
     }
 
-    /* Search input styling */
     #input {
-        margin: 15px 20px 10px 20px;
-        border: 2px solid rgba(98, 114, 164, 0.4);
+        margin: 10px 15px 5px 15px;
+        border: 1px solid rgba(98, 114, 164, 0.4);
         background: rgba(68, 71, 90, 0.6);
         color: #f8f8f2;
-        border-radius: 15px;
-        font-size: 16px;
-        padding: 15px 20px;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(5px);
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        font-size: 14px;
+        padding: 10px 15px;
+        transition: all 0.15s ease;
     }
 
     #input:focus {
         border-color: rgba(189, 147, 249, 0.8);
         background: rgba(68, 71, 90, 0.8);
-        box-shadow: 
-            inset 0 2px 4px rgba(0, 0, 0, 0.2),
-            0 0 20px rgba(189, 147, 249, 0.3);
     }
 
-    #input::placeholder {
-        color: rgba(248, 248, 242, 0.5);
-    }
-
-    /* Container styling */
     #inner-box {
-        margin: 10px 20px 20px 20px;
+        margin: 5px 15px 15px 15px;
         background: transparent;
-        border-radius: 15px;
+        border-radius: 10px;
     }
 
-    #outer-box {
-        margin: 0px;
-        padding: 0px;
-        background: transparent;
-    }
-
-    /* Scrollable area */
     #scroll {
         margin: 0px;
         border: none;
         background: transparent;
-        padding: 5px;
+        padding: 0px;
     }
 
-    /* Individual application entries */
     #entry {
         background: rgba(68, 71, 90, 0.3);
-        margin: 4px 8px;
-        padding: 15px 20px;
-        border-radius: 12px;
+        margin: 2px 4px;
+        padding: 10px 15px;
+        border-radius: 8px;
         border: 1px solid rgba(98, 114, 164, 0.2);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        backdrop-filter: blur(5px);
+        transition: all 0.1s ease;
+        min-height: 40px;
         display: flex;
         align-items: center;
-        min-height: 60px;
     }
 
     #entry:hover {
         background: rgba(98, 114, 164, 0.4);
         border-color: rgba(189, 147, 249, 0.6);
-        transform: translateY(-2px);
-        box-shadow: 
-            0 8px 25px rgba(0, 0, 0, 0.3),
-            0 0 20px rgba(189, 147, 249, 0.2);
+        transform: translateY(-1px);
     }
 
     #entry:selected {
-        background: linear-gradient(135deg, 
-            rgba(189, 147, 249, 0.3) 0%, 
-            rgba(255, 121, 198, 0.2) 100%);
+        background: rgba(189, 147, 249, 0.3);
         border-color: rgba(189, 147, 249, 0.8);
-        transform: translateY(-2px);
-        box-shadow: 
-            0 8px 25px rgba(0, 0, 0, 0.4),
-            0 0 25px rgba(189, 147, 249, 0.4);
+        transform: translateY(-1px);
     }
 
-    /* Icon styling */
     #entry #img {
-        margin-right: 15px;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        margin-right: 10px;
+        border-radius: 6px;
+        transition: all 0.1s ease;
     }
 
     #entry:hover #img {
-        transform: scale(1.05);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        transform: scale(1.02);
     }
 
-    #entry:selected #img {
-        transform: scale(1.1);
-        box-shadow: 0 6px 16px rgba(189, 147, 249, 0.4);
-    }
-
-    /* Text styling */
     #text {
         color: #f8f8f2;
-        font-size: 15px;
+        font-size: 13px;
         font-weight: 500;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         flex: 1;
         margin: 0;
         padding: 0;
@@ -429,429 +620,197 @@ programs.firefox = {
 
     #entry:hover #text {
         color: #ffffff;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     }
 
     #entry:selected #text {
         color: #ffffff;
         font-weight: 600;
-        text-shadow: 
-            0 1px 3px rgba(0, 0, 0, 0.4),
-            0 0 10px rgba(189, 147, 249, 0.3);
-    }
-
-    /* Scrollbar styling */
-    #scroll scrollbar {
-        background: transparent;
-        border: none;
-        border-radius: 10px;
-        margin: 0;
-        padding: 0;
-    }
-
-    #scroll scrollbar slider {
-        background: rgba(189, 147, 249, 0.4);
-        border: none;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-    }
-
-    #scroll scrollbar slider:hover {
-        background: rgba(189, 147, 249, 0.6);
-    }
-
-    #scroll scrollbar trough {
-        background: rgba(68, 71, 90, 0.3);
-        border-radius: 10px;
-        margin: 5px;
-    }
-
-    /* Loading state */
-    window.loading {
-        opacity: 0.8;
-    }
-
-    /* Responsive adjustments for smaller screens */
-    @media (max-width: 800px) {
-        window {
-            border-radius: 15px;
-        }
-        
-        #input {
-            margin: 10px 15px 8px 15px;
-            padding: 12px 16px;
-            font-size: 14px;
-        }
-        
-        #inner-box {
-            margin: 8px 15px 15px 15px;
-        }
-        
-        #entry {
-            padding: 12px 16px;
-            min-height: 50px;
-        }
-        
-        #entry #img {
-            margin-right: 12px;
-        }
-        
-        #text {
-            font-size: 14px;
-        }
-    }
-
-    /* Dark mode enhancements */
-    @media (prefers-color-scheme: dark) {
-        window {
-            background: linear-gradient(135deg, 
-                rgba(40, 42, 54, 0.98) 0%, 
-                rgba(68, 71, 90, 0.95) 100%);
-            border-color: rgba(189, 147, 249, 0.4);
-        }
-        
-        #input {
-            background: rgba(68, 71, 90, 0.8);
-            border-color: rgba(98, 114, 164, 0.5);
-        }
-        
-        #entry {
-            background: rgba(68, 71, 90, 0.4);
-            border-color: rgba(98, 114, 164, 0.3);
-        }
     }
   '';
-  
-# WAYBAR CONFIGURATION scaled down by 25% from 1.6x scaling
-programs.waybar = {
-  enable = true;
-  
-  settings = {
-    mainBar = {
-      layer = "top";
-      position = "top";
-      height = 34;  # Reduced from 45 (45 * 0.75 = 33.75, rounded to 34)
-      spacing = 0;
-      margin-top = 5;  # Reduced from 6 (6 * 0.75 = 4.5, rounded to 5)
-      margin-left = 9;  # Reduced from 12 (12 * 0.75 = 9)
-      margin-right = 9;  # Reduced from 12 (12 * 0.75 = 9)
-      
-      modules-left = [
-        "custom/launcher"
-        "hyprland/workspaces" 
-      ];
-      modules-center = [
-        "clock"
-      ];
-      modules-right = [
-        "pulseaudio"
-        "network"
-        "cpu"
-        "memory"
-        "battery"
-        "tray"
-        "custom/power"
-      ];
 
-      # Module configurations (unchanged - these don't affect visual size)
-      "custom/launcher" = {
-        format = " ";
-        on-click = "wofi --show drun";
-        tooltip = false;
-      };
+  # ===== WAYBAR CONFIGURATION (PERFORMANCE OPTIMIZED) =====
+  programs.waybar = {
+    enable = true;
+    
+    settings = {
+      mainBar = {
+        layer = "top";
+        position = "top";
+        height = 32;
+        spacing = 0;
+        margin-top = 4;
+        margin-left = 8;
+        margin-right = 8;
+        
+        modules-left = [
+          "custom/launcher"
+          "hyprland/workspaces" 
+        ];
+        modules-center = [
+          "clock"
+        ];
+        modules-right = [
+          "pulseaudio"
+          "network"
+          "cpu"
+          "memory"
+          "battery"
+          "tray"
+          "custom/power"
+        ];
 
-      "hyprland/workspaces" = {
-        disable-scroll = true;
-        all-outputs = true;
-        format = "{name}";
-        on-click = "activate";
-        sort-by-number = true;
-      };
-
-      clock = {
-        timezone = "America/New_York";
-        format = "{:%a %d %b  %I:%M %p}";
-        format-alt = "{:%A, %B %d, %Y (%R)}";
-        tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-      };
-
-      pulseaudio = {
-        scroll-step = 5;
-        format = "{icon} {volume}%";
-        format-muted = "󰖁 Muted";
-        format-icons = {
-          headphone = "";
-          hands-free = "";
-          headset = "";
-          phone = "";
-          portable = "";
-          car = "";
-          default = ["" "" ""];
+        "custom/launcher" = {
+          format = " ";
+          on-click = "wofi --show drun";
+          tooltip = false;
         };
-        on-click = "pavucontrol";
-        on-click-right = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
-        tooltip = true;
-        tooltip-format = "Volume: {volume}%";
-      };
 
-      network = {
-        interface = "wlp*";
-        format = "{ifname}";
-        format-wifi = "  {signalStrength}%";
-        format-ethernet = "󰈀 {ipaddr}";
-        format-disconnected = "󰖪 Disconnected";
-        tooltip-format = "{ifname} via {gwaddr} 󰊗";
-        tooltip-format-wifi = "{essid} ({signalStrength}%) 󰤨";
-        tooltip-format-ethernet = "{ifname} 󰈀";
-        tooltip-format-disconnected = "Disconnected";
-        max-length = 50;
-        on-click = "nm-connection-editor";
-      };
+        "hyprland/workspaces" = {
+          disable-scroll = true;
+          all-outputs = true;
+          format = "{name}";
+          on-click = "activate";
+          sort-by-number = true;
+        };
 
-      cpu = {
-        interval = 2;
-        format = "󰍛 {usage}%";
-        max-length = 10;
-        on-click = "kitty --class btop -e btop";
-      };
+        clock = {
+          timezone = "America/New_York";
+          format = "{:%H:%M}";
+          format-alt = "{:%a %d %b}";
+          tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+          interval = 60;
+        };
 
-      memory = {
-        interval = 2;
-        format = "󰾆 {percentage}%";
-        tooltip = true;
-        tooltip-format = "Memory: {used:0.1f}G/{total:0.1f}G";
-        on-click = "kitty --class btop -e btop";
-      };
+        pulseaudio = {
+          scroll-step = 5;
+          format = "{icon} {volume}%";
+          format-muted = "󰖁";
+          format-icons = ["" "" ""];
+          on-click = "pavucontrol";
+          on-click-right = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+          tooltip = false;
+        };
 
-      battery = {
-        # Auto-detect battery (works better than specifying BAT0)
-        # bat = "BAT0";
-        # adapter = "ADP1";
-        interval = 10;
-  states = {
-    warning = 30;
-    critical = 15;
-  };
-  max-length = 25;
-  format = "{icon} {capacity}%";
-  format-warning = "󰂃 {capacity}%";
-  format-critical = "󰁺 {capacity}%";
-  format-charging = "󰂄 {capacity}%";
-  format-plugged = "󰂄 {capacity}%";
-  format-alt = "{icon} {time} ({capacity}%)";
-  format-full = "󰁹 {capacity}%";
-  format-icons = ["󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹"];
-  tooltip = true;
-  tooltip-format = "{timeTo}, {capacity}%\n{power}W\nLeft: Power Menu | Right: Toggle Mode | Scroll: Quick Switch";
-  
-  # Click actions for TLP power management
-  on-click = "power-menu-battery";                    # Left click: Open power menu
-  on-click-right = "tlp-toggle-mode";                # Right click: Toggle AC/Battery mode
-  on-click-middle = "kitty --class power-stats -e sudo tlp-stat -s"; # Middle click: Quick stats
-  
-  # Scroll to quickly change power profiles
-  on-scroll-up = "sudo tlp ac && notify-send 'TLP' 'AC Profile (Performance)'";
-  on-scroll-down = "sudo tlp bat && notify-send 'TLP' 'Battery Profile (Power Saving)'";
-  
-  format-not-charging = "󰂄 {capacity}%";
-};
+        network = {
+          interval = 5;
+          format-wifi = "  {signalStrength}%";
+          format-ethernet = "󰈀";
+          format-disconnected = "󰖪";
+          max-length = 20;
+          on-click = "nm-connection-editor";
+          tooltip = false;
+        };
 
-      tray = {
-        icon-size = 12;  # Reduced from 16 (16 * 0.75 = 12)
-        spacing = 5;     # Reduced from 6 (6 * 0.75 = 4.5, rounded to 5)
-        show-passive-items = true;
-      };
+        cpu = {
+          interval = 3;
+          format = "󰍛 {usage}%";
+          max-length = 10;
+          on-click = "kitty --class btop -e btop";
+          tooltip = false;
+        };
 
-      "custom/power" = {
-        format = "⏻";
-        tooltip = false;
-        on-click = "wlogout";
-        on-click-right = "systemctl poweroff";
+        memory = {
+          interval = 3;
+          format = "󰾆 {percentage}%";
+          on-click = "kitty --class btop -e btop";
+          tooltip = false;
+        };
+
+        battery = {
+          interval = 30;
+          states = {
+            warning = 30;
+            critical = 15;
+          };
+          format = "{icon} {capacity}%";
+          format-charging = "󰂄 {capacity}%";
+          format-icons = ["󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹"];
+          on-click = "power-menu-battery";
+          on-click-right = "tlp-toggle-mode";
+          tooltip = false;
+        };
+
+        tray = {
+          icon-size = 14;
+          spacing = 4;
+          show-passive-items = true;
+        };
+
+        "custom/power" = {
+          format = "⏻";
+          tooltip = false;
+          on-click = "wlogout";
+          on-click-right = "systemctl poweroff";
+        };
       };
     };
+
+    style = ''
+      * {
+          border: none;
+          border-radius: 0;
+          font-family: "JetBrains Mono", monospace;
+          font-size: 11px;
+          min-height: 0;
+          margin: 0;
+          padding: 0;
+      }
+
+      window#waybar {
+          background: transparent;
+          color: #f8f8f2;
+      }
+
+      .modules-left,
+      .modules-center,
+      .modules-right {
+          background: rgba(40, 42, 54, 0.85);
+          border-radius: 12px;
+          margin: 0 4px;
+          padding: 0 4px;
+          border: 1px solid rgba(68, 71, 90, 0.5);
+      }
+
+      .modules-left > widget:first-child > #workspaces,
+      .modules-center > widget > #clock,
+      .modules-right > widget > * {
+          margin: 0 2px;
+          padding: 4px 8px;
+          border-radius: 8px;
+          background: transparent;
+          transition: all 0.15s ease;
+      }
+
+      #workspaces button {
+          padding: 4px 8px;
+          margin: 0 1px;
+          background: transparent;
+          color: #6272a4;
+          border-radius: 6px;
+          transition: all 0.15s ease;
+          min-width: 20px;
+      }
+
+      #workspaces button.active {
+          background: rgba(189, 147, 249, 0.3);
+          color: #bd93f9;
+      }
+
+      #clock { color: #f8f8f2; }
+      #pulseaudio { color: #ff79c6; }
+      #network { color: #50fa7b; }
+      #cpu { color: #ffb86c; }
+      #memory { color: #ff79c6; }
+      #battery { color: #50fa7b; }
+      #custom-power { color: #ff5555; }
+
+      #battery.charging { color: #f1fa8c; }
+      #battery.warning:not(.charging) { color: #ffb86c; }
+      #battery.critical:not(.charging) { color: #ff5555; }
+    '';
   };
 
-  # CSS styling scaled down by 25%
-  style = ''
-    * {
-        border: none;
-        border-radius: 0;
-        font-family: "JetBrains Mono Nerd Font", "Font Awesome 6 Free", monospace;
-        font-size: 11px;  /* Reduced from 14px (14 * 0.75 = 10.5, rounded to 11) */
-        min-height: 0;
-        margin: 0;
-        padding: 0;
-    }
-
-    window#waybar {
-        background: transparent;
-        color: #f8f8f2;
-    }
-
-    tooltip {
-        background: rgba(40, 42, 54, 0.95);
-        border: 1px solid #6272a4;
-        border-radius: 8px;  /* Reduced from 10px (10 * 0.75 = 7.5, rounded to 8) */
-        color: #f8f8f2;
-        font-size: 10px;  /* Reduced from 13px (13 * 0.75 = 9.75, rounded to 10) */
-    }
-
-    .modules-left,
-    .modules-center,
-    .modules-right {
-        background: rgba(40, 42, 54, 0.85);
-        border-radius: 14px;  /* Reduced from 18px (18 * 0.75 = 13.5, rounded to 14) */
-        margin: 0 5px;  /* Reduced from 6px (6 * 0.75 = 4.5, rounded to 5) */
-        padding: 0 5px;  /* Reduced from 6px (6 * 0.75 = 4.5, rounded to 5) */
-        border: 2px solid rgba(68, 71, 90, 0.5);
-    }
-
-    .modules-left > widget:first-child > #workspaces,
-    .modules-center > widget > #clock,
-    .modules-right > widget > * {
-        margin: 0 3px;  /* Reduced from 4px (4 * 0.75 = 3) */
-        padding: 5px 9px;  /* Reduced from 6px 12px (6*0.75=4.5→5, 12*0.75=9) */
-        border-radius: 9px;  /* Reduced from 12px (12 * 0.75 = 9) */
-        background: transparent;
-        transition: all 0.3s ease;
-    }
-
-    #custom-launcher {
-        color: #50fa7b;
-        font-size: 14px;  /* Reduced from 18px (18 * 0.75 = 13.5, rounded to 14) */
-        font-weight: bold;
-        margin-right: 5px;  /* Reduced from 6px (6 * 0.75 = 4.5, rounded to 5) */
-        padding: 5px 11px;  /* Reduced from 6px 15px (6*0.75=4.5→5, 15*0.75=11.25→11) */
-    }
-
-    #custom-launcher:hover {
-        background: rgba(80, 250, 123, 0.1);
-        color: #50fa7b;
-    }
-
-    #workspaces {
-        padding: 0;
-        margin: 0;
-        background: transparent;
-    }
-
-    #workspaces button {
-        padding: 5px 9px;  /* Reduced from 6px 12px (6*0.75=4.5→5, 12*0.75=9) */
-        margin: 0 2px;  /* Reduced from 2px (2 * 0.75 = 1.5, rounded to 2) */
-        background: transparent;
-        color: #6272a4;
-        border-radius: 8px;  /* Reduced from 10px (10 * 0.75 = 7.5, rounded to 8) */
-        transition: all 0.3s ease;
-        font-size: 11px;  /* Reduced from 15px (15 * 0.75 = 11.25, rounded to 11) */
-        min-width: 24px;  /* Reduced from 32px (32 * 0.75 = 24) */
-    }
-
-    #workspaces button:hover {
-        background: rgba(98, 114, 164, 0.2);
-        color: #f8f8f2;
-    }
-
-    #workspaces button.active {
-        background: rgba(189, 147, 249, 0.3);
-        color: #bd93f9;
-        font-weight: bold;
-    }
-
-    #clock {
-        color: #f8f8f2;
-        font-weight: 500;
-        font-size: 11px;  /* Reduced from 15px (15 * 0.75 = 11.25, rounded to 11) */
-        padding: 5px 12px;  /* Reduced from 6px 16px (6*0.75=4.5→5, 16*0.75=12) */
-    }
-
-    #clock:hover {
-        background: rgba(248, 248, 242, 0.1);
-    }
-
-    #pulseaudio {
-        color: #ff79c6;
-    }
-
-    #pulseaudio:hover {
-        background: rgba(255, 121, 198, 0.1);
-    }
-
-    #pulseaudio.muted {
-        color: #6272a4;
-    }
-
-    #network {
-        color: #50fa7b;
-    }
-
-    #network:hover {
-        background: rgba(80, 250, 123, 0.1);
-    }
-
-    #network.disconnected {
-        color: #ff5555;
-    }
-
-    #cpu {
-        color: #ffb86c;
-    }
-
-    #cpu:hover {
-        background: rgba(255, 184, 108, 0.1);
-    }
-
-    #memory {
-        color: #ff79c6;
-    }
-
-    #memory:hover {
-        background: rgba(255, 121, 198, 0.1);
-    }
-
-    #battery {
-        color: #50fa7b;
-    }
-
-    #battery:hover {
-        background: rgba(80, 250, 123, 0.1);
-    }
-
-    #battery.charging {
-        color: #f1fa8c;
-    }
-
-    #battery.warning:not(.charging) {
-        color: #ffb86c;
-    }
-
-    #battery.critical:not(.charging) {
-        color: #ff5555;
-    }
-
-    #tray {
-        background: transparent;
-    }
-
-    #tray > .passive {
-        opacity: 0.5;
-    }
-
-    #custom-power {
-        color: #ff5555;
-        font-size: 14px;  /* Reduced from 18px (18 * 0.75 = 13.5, rounded to 14) */
-        font-weight: bold;
-        margin-left: 5px;  /* Reduced from 6px (6 * 0.75 = 4.5, rounded to 5) */
-        padding: 5px 11px;  /* Reduced from 6px 15px (6*0.75=4.5→5, 15*0.75=11.25→11) */
-    }
-
-    #custom-power:hover {
-        background: rgba(255, 85, 85, 0.2);
-        color: #ff5555;
-    }
-  '';
-};
-
-  # GTK configuration for 1.6x scaling
+  # ===== GTK CONFIGURATION =====
   gtk = {
     enable = true;
     theme = {
@@ -864,17 +823,489 @@ programs.waybar = {
     };
     font = {
       name = "Inter";
-      size = 13;  # Adjusted for 1.6x scaling
+      size = 13;
     };
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
       gtk-cursor-theme-name = "Nordzy-cursors";
-      gtk-cursor-theme-size = 40;  # Updated for 1.6x scaling
+      gtk-cursor-theme-size = 40;
+      gtk-enable-animations = false;
+      gtk-primary-button-warps-slider = false;
     };
     gtk4.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
       gtk-cursor-theme-name = "Nordzy-cursors";
-      gtk-cursor-theme-size = 40;  # Updated for 1.6x scaling
+      gtk-cursor-theme-size = 40;
     };
+  };
+
+  # ===== XDG CONFIGURATION =====
+  xdg = {
+    enable = true;
+    userDirs = {
+      enable = true;
+      createDirectories = true;
+      desktop = "$HOME/Desktop";
+      documents = "$HOME/Documents";
+      download = "$HOME/Downloads";
+      music = "$HOME/Music";
+      pictures = "$HOME/Pictures";
+      videos = "$HOME/Videos";
+      templates = "$HOME/Templates";
+      publicShare = "$HOME/Public";
+    };
+    
+    # MIME type associations
+    mimeApps = {
+      enable = true;
+      defaultApplications = {
+        "text/html" = "firefox.desktop";
+        "x-scheme-handler/http" = "firefox.desktop";
+        "x-scheme-handler/https" = "firefox.desktop";
+        "x-scheme-handler/about" = "firefox.desktop";
+        "x-scheme-handler/unknown" = "firefox.desktop";
+        "application/pdf" = "firefox.desktop";
+        "image/jpeg" = "org.gnome.eog.desktop";
+        "image/png" = "org.gnome.eog.desktop";
+        "text/plain" = "code.desktop";
+        "inode/directory" = "thunar.desktop";
+      };
+    };
+  };
+
+  # ===== ADDITIONAL CONFIGURATION FILES =====
+  # Hyprpaper configuration with fallback wallpaper
+  home.file.".config/hypr/hyprpaper.conf".text = ''
+    preload = ~/.config/hypr/wallpaper.jpg
+    wallpaper = ,~/.config/hypr/wallpaper.jpg
+    splash = false
+    ipc = on
+  '';
+
+  # Create a default wallpaper if none exists
+  home.file.".config/hypr/wallpaper.jpg".source = let
+    # Create a simple gradient wallpaper using imagemagick
+    defaultWallpaper = pkgs.runCommand "default-wallpaper.jpg" 
+      { buildInputs = [ pkgs.imagemagick ]; } ''
+      ${pkgs.imagemagick}/bin/convert -size 2256x1504 gradient:"#282a36-#44475a" $out
+    '';
+  in defaultWallpaper;
+
+  # Swaylock configuration
+  home.file.".config/swaylock/config".text = ''
+    image=~/.config/hypr/wallpaper.jpg
+    scaling=fill
+    font=JetBrains Mono
+    font-size=24
+    indicator-radius=120
+    indicator-thickness=10
+    key-hl-color=bd93f9
+    separator-color=44475a
+    inside-color=282a36
+    ring-color=6272a4
+    line-color=282a36
+    text-color=f8f8f2
+    caps-lock-key-hl-color=ff5555
+    caps-lock-bs-hl-color=ff5555
+    disable-caps-lock-text
+    show-failed-attempts
+    fade-in=0.2
+  '';
+
+  # Wlogout layout
+  home.file.".config/wlogout/layout".text = ''
+    [
+        {
+            "label" : "lock",
+            "action" : "swaylock",
+            "text" : "Lock",
+            "keybind" : "l"
+        },
+        {
+            "label" : "hibernate",
+            "action" : "systemctl hibernate",
+            "text" : "Hibernate",
+            "keybind" : "h"
+        },
+        {
+            "label" : "logout",
+            "action" : "hyprctl dispatch exit",
+            "text" : "Logout",
+            "keybind" : "e"
+        },
+        {
+            "label" : "shutdown",
+            "action" : "systemctl poweroff",
+            "text" : "Shutdown",
+            "keybind" : "s"
+        },
+        {
+            "label" : "suspend",
+            "action" : "systemctl suspend",
+            "text" : "Sleep",
+            "keybind" : "u"
+        },
+        {
+            "label" : "reboot",
+            "action" : "systemctl reboot",
+            "text" : "Reboot",
+            "keybind" : "r"
+        }
+    ]
+  '';
+
+  # Wlogout styling
+  home.file.".config/wlogout/style.css".text = ''
+    * {
+      background-image: none;
+      box-shadow: none;
+    }
+
+    window {
+      background-color: rgba(40, 42, 54, 0.9);
+    }
+
+    button {
+        color: #f8f8f2;
+      background-color: #44475a;
+      border-style: solid;
+      border-width: 3px;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 25%;
+      border-radius: 20px;
+      margin: 10px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    button:focus, button:active, button:hover {
+      background-color: #6272a4;
+      border-color: #bd93f9;
+      outline-style: none;
+      transform: scale(1.05);
+    }
+
+    #lock {
+        border-color: #50fa7b;
+    }
+
+    #logout {
+        border-color: #f1fa8c;
+    }
+
+    #suspend {
+        border-color: #8be9fd;
+    }
+
+    #hibernate {
+        border-color: #ffb86c;
+    }
+
+    #shutdown {
+        border-color: #ff5555;
+    }
+
+    #reboot {
+        border-color: #ff79c6;
+    }
+  '';
+
+  # ===== HOME PACKAGES =====
+  home.packages = with pkgs; [
+    # Gesture support
+    libinput-gestures
+    wmctrl
+    xdotool
+    
+    # Additional utilities
+    bc
+    acpi
+    upower
+    
+    # Development tools
+    nil  # Nix language server
+    
+    # Media tools
+    playerctl
+    
+    # File management
+    trash-cli
+    
+    # Performance monitoring
+    iotop
+    nethogs
+  ];
+
+  # ===== SYSTEMD USER SERVICES =====
+  systemd.user.services = {
+    # Auto-start libinput-gestures
+    libinput-gestures = {
+      Unit = {
+        Description = "Libinput Gestures";
+        After = [ "graphical-session.target" ];
+        PartOf = [ "graphical-session.target" ];
+      };
+      Service = {
+        Type = "simple";
+        ExecStart = "${pkgs.libinput-gestures}/bin/libinput-gestures";
+        ExecReload = "${pkgs.coreutils}/bin/kill -USR1 $MAINPID";
+        Restart = "on-failure";
+        RestartSec = 3;
+      };
+      Install = {
+        WantedBy = [ "graphical-session.target" ];
+      };
+    };
+
+    # Clipboard history daemon
+    cliphist = {
+      Unit = {
+        Description = "Clipboard History";
+        After = [ "graphical-session.target" ];
+        PartOf = [ "graphical-session.target" ];
+      };
+      Service = {
+        Type = "simple";
+        ExecStart = "${pkgs.cliphist}/bin/cliphist daemon";
+        Restart = "on-failure";
+        RestartSec = 3;
+      };
+      Install = {
+        WantedBy = [ "graphical-session.target" ];
+      };
+    };
+  };
+
+  # ===== PROGRAM CONFIGURATIONS =====
+  # Git configuration
+  programs.git = {
+    enable = true;
+    userName = "dylan";
+    userEmail = "dylan@example.com";  # Update with your email
+    extraConfig = {
+      init.defaultBranch = "main";
+      pull.rebase = false;
+      core.editor = "code --wait";
+    };
+  };
+
+  # Bash configuration
+  programs.bash = {
+    enable = true;
+    enableCompletion = true;
+    historyControl = [ "ignoredups" "ignorespace" ];
+    historySize = 10000;
+    
+    shellAliases = {
+      ll = "eza -la";
+      la = "eza -la";
+      ls = "eza";
+      tree = "eza --tree";
+      cat = "bat";
+      grep = "rg";
+      find = "fd";
+      
+      # Hyprland specific
+      hypr-reload = "hyprctl reload";
+      hypr-logs = "journalctl -u display-manager -f";
+      
+      # Btop wallpaper aliases
+      btop-start = "btop-wallpaper start";
+      btop-stop = "btop-wallpaper stop";
+      btop-toggle = "btop-wallpaper toggle";
+      
+      # System monitoring
+      temps = "sensors";
+      battery = "upower -i /org/freedesktop/UPower/devices/battery_BAT0";
+      
+      # Performance
+      performance = "hypr-performance";
+    };
+    
+    bashrcExtra = ''
+      # Framework 13 specific optimizations
+      export EDITOR="code --wait"
+      export BROWSER="firefox"
+      export TERMINAL="kitty"
+      
+      # Path additions
+      export PATH="$HOME/.local/bin:$PATH"
+      
+      # Performance optimizations
+      export HISTCONTROL=ignoreboth
+      export HISTSIZE=10000
+      export HISTFILESIZE=20000
+      
+      # Wayland specific
+      export MOZ_ENABLE_WAYLAND=1
+      export QT_QPA_PLATFORM=wayland
+      export SDL_VIDEODRIVER=wayland
+      
+      # Custom functions
+      function hypr-screen() {
+        grim -g "$(slurp)" ~/Pictures/Screenshots/screenshot-$(date +%Y-%m-%d_%H-%M-%S).png
+      }
+      
+      function hypr-record() {
+        wf-recorder -g "$(slurp)" -f ~/Videos/recording-$(date +%Y-%m-%d_%H-%M-%S).mp4
+      }
+      
+      function wofi-calc() {
+        echo "$(($1))" | wl-copy
+        notify-send "Calculator" "Result: $(($1)) (copied to clipboard)"
+      }
+    '';
+  };
+
+  # Starship prompt (optional, for a modern terminal prompt)
+  programs.starship = {
+    enable = true;
+    settings = {
+      format = "$all$character";
+      character = {
+        success_symbol = "[➜](bold green)";
+        error_symbol = "[➜](bold red)";
+      };
+      directory = {
+        style = "blue";
+        truncation_length = 3;
+        truncate_to_repo = false;
+      };
+      git_branch = {
+        style = "purple";
+        format = "[$symbol$branch]($style) ";
+      };
+      battery = {
+        display = [
+          {
+            threshold = 30;
+            style = "bold red";
+          }
+          {
+            threshold = 60;
+            style = "bold yellow";
+          }
+          {
+            threshold = 100;
+            style = "bold green";
+          }
+        ];
+      };
+    };
+  };
+
+  # ===== PERFORMANCE MONITORING ALIASES =====
+  home.sessionVariables = {
+    EDITOR = "code --wait";
+    BROWSER = "firefox";
+    TERMINAL = "kitty";
+    
+    # Wayland specific
+    MOZ_ENABLE_WAYLAND = "1";
+    QT_QPA_PLATFORM = "wayland";
+    SDL_VIDEODRIVER = "wayland";
+    
+    # Performance
+    HISTCONTROL = "ignoreboth";
+    HISTSIZE = "10000";
+    HISTFILESIZE = "20000";
+  };
+
+  # ===== FONTS CONFIGURATION =====
+  fonts.fontconfig.enable = true;
+
+  # ===== ADDITIONAL SCRIPTS FOR HOME =====
+  home.file.".local/bin/hypr-info" = {
+    text = ''
+      #!/bin/bash
+      # Comprehensive Hyprland system information
+      echo "=== Hyprland System Information ==="
+      echo "Date: $(date)"
+      echo "Uptime: $(uptime -p)"
+      echo ""
+      
+      echo "=== Hyprland Status ==="
+      if pgrep -x Hyprland >/dev/null; then
+        echo "✅ Hyprland is running"
+        echo "Version: $(hyprctl version | head -1)"
+        echo "Active window: $(hyprctl activewindow | grep class | cut -d: -f2)"
+        echo "Workspace: $(hyprctl activeworkspace | grep workspace | cut -d: -f2)"
+      else
+        echo "❌ Hyprland is not running"
+      fi
+      echo ""
+      
+      echo "=== Plugin Status ==="
+      hyprctl plugin list 2>/dev/null || echo "No plugins loaded or hyprctl unavailable"
+      echo ""
+      
+      echo "=== Performance ==="
+      echo "Load: $(uptime | awk -F'load average:' '{print $2}' | awk '{print $1}' | sed 's/,//')"
+      echo "Memory: $(free | grep Mem | awk '{printf "%.0f", $3/$2 * 100.0}')%"
+      echo "Disk: $(df -h / | tail -1 | awk '{print $5}')"
+      echo ""
+      
+      echo "=== Display Info ==="
+      echo "Monitors: $(hyprctl monitors | grep Monitor | wc -l)"
+      echo "Resolution: $(hyprctl monitors | grep -m1 '@' | awk '{print $1}' | cut -d'@' -f1)"
+      echo "Scale: $(hyprctl monitors | grep -m1 'scale:' | awk '{print $2}')"
+    '';
+    executable = true;
+  };
+
+  home.file.".local/bin/debug-autostart" = {
+    text = ''
+      #!/bin/bash
+      # Debug script to check autostart issues
+      
+      echo "=== Autostart Debug Information ==="
+      echo "Date: $(date)"
+      echo ""
+      
+      echo "=== Process Check ==="
+      echo "Hyprland running: $(pgrep -x Hyprland >/dev/null && echo "✅ Yes" || echo "❌ No")"
+      echo "Waybar running: $(pgrep -x waybar >/dev/null && echo "✅ Yes" || echo "❌ No")"
+      echo "Hyprpaper running: $(pgrep -x hyprpaper >/dev/null && echo "✅ Yes" || echo "❌ No")"
+      echo "Btop wallpaper: $(pgrep -f "kitty.*btop-wallpaper" >/dev/null && echo "✅ Running" || echo "❌ Not running")"
+      echo ""
+      
+      echo "=== File Check ==="
+      echo "Wallpaper exists: $([ -f ~/.config/hypr/wallpaper.jpg ] && echo "✅ Yes" || echo "❌ No")"
+      echo "Hyprpaper config: $([ -f ~/.config/hypr/hyprpaper.conf ] && echo "✅ Yes" || echo "❌ No")"
+      echo "Autostart script: $([ -f ~/.local/bin/btop-wallpaper-autostart ] && echo "✅ Yes" || echo "❌ No")"
+      echo ""
+      
+      echo "=== Script Permissions ==="
+      ls -la ~/.local/bin/btop-wallpaper* 2>/dev/null || echo "Scripts not found"
+      echo ""
+      
+      echo "=== Manual Test ==="
+      echo "Testing btop wallpaper manually..."
+      btop-wallpaper start &
+      sleep 3
+      if pgrep -f "kitty.*btop-wallpaper" >/dev/null; then
+        echo "✅ Manual start successful"
+        btop-wallpaper stop
+      else
+        echo "❌ Manual start failed"
+      fi
+      echo ""
+      
+      echo "=== Hyprland Windows ==="
+      hyprctl clients | grep -E "(class|title|workspace)" | head -10
+    '';
+    executable = true;
+  };
+
+  # ===== FINAL HOME MANAGER CONFIGURATION =====
+  # This ensures all configurations are properly applied
+  home.activation = {
+    # Create necessary directories
+    createDirs = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      mkdir -p $HOME/.local/bin
+      mkdir -p $HOME/Pictures/Screenshots
+      mkdir -p $HOME/Videos
+      mkdir -p $HOME/.cache
+    '';
   };
 }
