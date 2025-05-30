@@ -270,49 +270,49 @@
       bind = SUPER, C, exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy
 
       # ===== WINDOW RULES =====
-      # Floating windows
-      windowrule = float, ^(pavucontrol)$
-      windowrule = float, ^(blueman-manager)$
-      windowrule = float, ^(nm-connection-editor)$
-      windowrule = float, ^(file-roller)$
-      windowrule = float, title:^(Picture-in-Picture)$
-      windowrule = float, ^(org.gnome.Calculator)$
-      windowrule = float, ^(org.gnome.Characters)$
-      windowrule = float, ^(org.gnome.clocks)$
+      # Floating windows - all using windowrulev2 syntax
+      windowrulev2 = float,class:pavucontrol
+      windowrulev2 = float,class:blueman-manager
+      windowrulev2 = float,class:nm-connection-editor
+      windowrulev2 = float,class:file-roller
+      windowrulev2 = float,title:Picture-in-Picture
+      windowrulev2 = float,class:org.gnome.Calculator
+      windowrulev2 = float,class:org.gnome.Characters
+      windowrulev2 = float,class:org.gnome.clocks
 
-      # Window sizing
-      windowrule = size 800 600, ^(pavucontrol)$
-      windowrule = center, ^(pavucontrol)$
-      windowrule = size 60% 60%, title:^(Picture-in-Picture)$
-      windowrule = move 39% 39%, title:^(Picture-in-Picture)$
+      # Window sizing - all using windowrulev2 syntax
+      windowrulev2 = size 800 600,class:pavucontrol
+      windowrulev2 = center,class:pavucontrol
+      windowrulev2 = size 60% 60%,title:Picture-in-Picture
+      windowrulev2 = move 39% 39%,title:Picture-in-Picture
 
       # Btop wallpaper specific rules
-      windowrulev2 = float, class:(btop-wallpaper)
-      windowrulev2 = pin, class:(btop-wallpaper)
-      windowrulev2 = nofocus, class:(btop-wallpaper)
-      windowrulev2 = noborder, class:(btop-wallpaper)
-      windowrulev2 = noshadow, class:(btop-wallpaper)
-      windowrulev2 = opacity 0.8, class:(btop-wallpaper)
+      windowrulev2 = float,class:btop-wallpaper
+      windowrulev2 = pin,class:btop-wallpaper
+      windowrulev2 = nofocus,class:btop-wallpaper
+      windowrulev2 = noborder,class:btop-wallpaper
+      windowrulev2 = noshadow,class:btop-wallpaper
+      windowrulev2 = opacity 0.8,class:btop-wallpaper
 
       # Power management window rules
-      windowrule = float, ^(floating-terminal)$
-      windowrule = size 800 600, ^(floating-terminal)$
-      windowrule = center, ^(floating-terminal)$
+      windowrulev2 = float,class:floating-terminal
+      windowrulev2 = size 800 600,class:floating-terminal
+      windowrulev2 = center,class:floating-terminal
 
       # Workspace assignments
-      windowrule = workspace 2, ^(firefox)$
-      windowrule = workspace 3, ^(code)$
-      windowrule = workspace 4, ^(discord)$
+      windowrulev2 = workspace 2,class:firefox
+      windowrulev2 = workspace 3,class:code
+      windowrulev2 = workspace 4,class:discord
 
       # Performance rules
-      windowrulev2 = immediate, class:(steam_app_*)
-      windowrulev2 = immediate, class:(lutris)
-      windowrulev2 = immediate, class:(bottles)
+      windowrulev2 = immediate,class:steam_app_.*
+      windowrulev2 = immediate,class:lutris
+      windowrulev2 = immediate,class:bottles
 
       # Transparency
-      windowrulev2 = opacity 0.95, class:(kitty)
-      windowrulev2 = opacity 0.95, class:(thunar)
-      windowrulev2 = opacity 0.9, class:(wofi)
+      windowrulev2 = opacity 0.95,class:kitty
+      windowrulev2 = opacity 0.95,class:thunar
+      windowrulev2 = opacity 0.9,class:wofi
     '';
   };
 
@@ -1034,6 +1034,112 @@
     # Performance monitoring
     iotop
     nethogs
+    
+    # Custom btop wallpaper script
+    (writeScriptBin "btop-wallpaper" ''
+      #!${runtimeShell}
+      # Btop wallpaper manager - using floating terminal approach
+      
+      show_help() {
+        echo "Btop Wallpaper Manager for Framework 13"
+        echo "Usage: btop-wallpaper [command] [options]"
+        echo ""
+        echo "Commands:"
+        echo "  start [position]  - Start btop monitor"
+        echo "  stop             - Stop btop monitor"  
+        echo "  restart [pos]    - Restart btop monitor"
+        echo "  status           - Show current status"
+        echo "  toggle           - Toggle btop monitor on/off"
+      }
+      
+      start_btop() {
+        local position=''${1:-center}
+        
+        # Kill existing instance
+        ${procps}/bin/pkill -f "kitty.*btop-wallpaper" 2>/dev/null || true
+        sleep 0.5
+        
+        # Launch btop in floating terminal with wallpaper-like properties
+        ${hyprland}/bin/hyprctl dispatch exec "${kitty}/bin/kitty --class btop-wallpaper -o font_size=11 -o background_opacity=0.8 -o window_padding_width=8 -e ${btop}/bin/btop"
+        
+        # Wait and position the window
+        sleep 2
+        case $position in
+          "corner")
+            ${hyprland}/bin/hyprctl dispatch movewindowpixel "exact 800 30,class:btop-wallpaper"
+            ${hyprland}/bin/hyprctl dispatch resizewindowpixel "exact 600 400,class:btop-wallpaper"
+            ;;
+          "left")
+            ${hyprland}/bin/hyprctl dispatch movewindowpixel "exact 30 30,class:btop-wallpaper"
+            ${hyprland}/bin/hyprctl dispatch resizewindowpixel "exact 600 500,class:btop-wallpaper"
+            ;;
+          "right")
+            ${hyprland}/bin/hyprctl dispatch movewindowpixel "exact 780 30,class:btop-wallpaper"
+            ${hyprland}/bin/hyprctl dispatch resizewindowpixel "exact 600 500,class:btop-wallpaper"
+            ;;
+          *)
+            ${hyprland}/bin/hyprctl dispatch movewindowpixel "exact 350 220,class:btop-wallpaper"
+            ${hyprland}/bin/hyprctl dispatch resizewindowpixel "exact 700 500,class:btop-wallpaper"
+            ;;
+        esac
+        
+        # Verify it started
+        sleep 1
+        if ${procps}/bin/pgrep -f "kitty.*btop-wallpaper" >/dev/null; then
+          ${libnotify}/bin/notify-send "Btop Monitor" "Started in $position position" --timeout=2000
+        else
+          ${libnotify}/bin/notify-send "Btop Monitor" "Failed to start" --urgency=critical
+        fi
+      }
+      
+      stop_btop() {
+        if ${procps}/bin/pkill -f "kitty.*btop-wallpaper" 2>/dev/null; then
+          ${libnotify}/bin/notify-send "Btop Monitor" "Stopped" --timeout=2000
+        else
+          echo "No btop monitor instance found"
+        fi
+      }
+      
+      show_status() {
+        if ${procps}/bin/pgrep -f "kitty.*btop-wallpaper" >/dev/null; then
+          echo "✅ Btop monitor is running"
+          ${hyprland}/bin/hyprctl clients | ${gnugrep}/bin/grep -A 5 "btop-wallpaper" || echo "Window info not available"
+        else
+          echo "❌ Btop monitor is not running"
+        fi
+      }
+      
+      toggle_btop() {
+        if ${procps}/bin/pgrep -f "kitty.*btop-wallpaper" >/dev/null; then
+          stop_btop
+        else
+          start_btop center
+        fi
+      }
+      
+      case "$1" in
+        "start")
+          start_btop "$2"
+          ;;
+        "stop")
+          stop_btop
+          ;;
+        "restart")
+          stop_btop
+          sleep 1
+          start_btop "$2"
+          ;;
+        "status")
+          show_status
+          ;;
+        "toggle")
+          toggle_btop
+          ;;
+        *)
+          show_help
+          ;;
+      esac
+    '')
   ];
 
   # ===== SYSTEMD USER SERVICES =====
@@ -1249,6 +1355,114 @@
       echo "Monitors: $(hyprctl monitors | grep Monitor | wc -l)"
       echo "Resolution: $(hyprctl monitors | grep -m1 '@' | awk '{print $1}' | cut -d'@' -f1)"
       echo "Scale: $(hyprctl monitors | grep -m1 'scale:' | awk '{print $2}')"
+    '';
+    executable = true;
+  };
+
+  home.file.".local/bin/btop-wallpaper" = {
+    text = ''
+      #!/bin/bash
+      # Btop wallpaper manager - using floating terminal approach
+      
+      show_help() {
+        echo "Btop Wallpaper Manager for Framework 13"
+        echo "Usage: btop-wallpaper [command] [options]"
+        echo ""
+        echo "Commands:"
+        echo "  start [position]  - Start btop monitor"
+        echo "  stop             - Stop btop monitor"
+        echo "  restart [pos]    - Restart btop monitor"
+        echo "  status           - Show current status"
+        echo "  toggle           - Toggle btop monitor on/off"
+      }
+      
+      start_btop() {
+        local position=''${1:-center}
+        
+        # Kill existing instance
+        pkill -f "kitty.*btop-wallpaper" 2>/dev/null || true
+        sleep 0.5
+        
+        # Launch btop in floating terminal with wallpaper-like properties
+        hyprctl dispatch exec "kitty --class btop-wallpaper -o font_size=11 -o background_opacity=0.8 -o window_padding_width=8 -e btop"
+        
+        # Wait and position the window
+        sleep 2
+        case $position in
+          "corner")
+            hyprctl dispatch movewindowpixel "exact 800 30,class:btop-wallpaper"
+            hyprctl dispatch resizewindowpixel "exact 600 400,class:btop-wallpaper"
+            ;;
+          "left")
+            hyprctl dispatch movewindowpixel "exact 30 30,class:btop-wallpaper"
+            hyprctl dispatch resizewindowpixel "exact 600 500,class:btop-wallpaper"
+            ;;
+          "right")
+            hyprctl dispatch movewindowpixel "exact 780 30,class:btop-wallpaper"
+            hyprctl dispatch resizewindowpixel "exact 600 500,class:btop-wallpaper"
+            ;;
+          *)
+            hyprctl dispatch movewindowpixel "exact 350 220,class:btop-wallpaper"
+            hyprctl dispatch resizewindowpixel "exact 700 500,class:btop-wallpaper"
+            ;;
+        esac
+        
+        # Verify it started
+        sleep 1
+        if pgrep -f "kitty.*btop-wallpaper" >/dev/null; then
+          notify-send "Btop Monitor" "Started in $position position" --timeout=2000
+        else
+          notify-send "Btop Monitor" "Failed to start" --urgency=critical
+        fi
+      }
+      
+      stop_btop() {
+        if pkill -f "kitty.*btop-wallpaper" 2>/dev/null; then
+          notify-send "Btop Monitor" "Stopped" --timeout=2000
+        else
+          echo "No btop monitor instance found"
+        fi
+      }
+      
+      show_status() {
+        if pgrep -f "kitty.*btop-wallpaper" >/dev/null; then
+          echo "✅ Btop monitor is running"
+          hyprctl clients | grep -A 5 "btop-wallpaper" || echo "Window info not available"
+        else
+          echo "❌ Btop monitor is not running"
+        fi
+      }
+      
+      toggle_btop() {
+        if pgrep -f "kitty.*btop-wallpaper" >/dev/null; then
+          stop_btop
+        else
+          start_btop center
+        fi
+      }
+      
+      case "$1" in
+        "start")
+          start_btop "$2"
+          ;;
+        "stop")
+          stop_btop
+          ;;
+        "restart")
+          stop_btop
+          sleep 1
+          start_btop "$2"
+          ;;
+        "status")
+          show_status
+          ;;
+        "toggle")
+          toggle_btop
+          ;;
+        *)
+          show_help
+          ;;
+      esac
     '';
     executable = true;
   };
