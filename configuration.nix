@@ -455,6 +455,7 @@ imports = [
     
     # ===== DEVELOPMENT TOOLS =====
     git
+    gh
     vscode
     vim
     neovim
