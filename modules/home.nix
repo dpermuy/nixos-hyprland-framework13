@@ -53,19 +53,19 @@
           }
       }
 
-      # ===== GENERAL APPEARANCE =====
-      general {
-          gaps_in = 8
-          gaps_out = 16
-          border_size = 3
-          col.active_border = rgba(bd93f9ff) rgba(ff79c6ff) 45deg
-          col.inactive_border = rgba(44475aff)
-          layout = dwindle
-          
-          # Performance optimizations - updated for newer Hyprland
-          resize_on_border = true
-          extend_border_grab_area = 5
-      }
+        # ===== GENERAL APPEARANCE =====
+        general {
+            gaps_in = 3      # Reduced from 8 to 3
+            gaps_out = 6     # Reduced from 16 to 6
+            border_size = 2  # Reduced from 3 to 2 (optional)
+            col.active_border = rgba(bd93f9ff) rgba(ff79c6ff) 45deg
+            col.inactive_border = rgba(44475aff)
+            layout = dwindle
+    
+            # Performance optimizations - updated for newer Hyprland
+            resize_on_border = true
+            extend_border_grab_area = 5
+        }
 
       # ===== DECORATION (OPTIMIZED FOR PERFORMANCE) =====
       decoration {
@@ -158,7 +158,6 @@
       }
 
       # ===== AUTOSTART APPLICATIONS =====
-      exec-once = waybar
       exec-once = hyprpaper
       exec-once = swaync
       exec-once = nm-applet --indicator
@@ -286,13 +285,17 @@
       windowrulev2 = size 60% 60%,title:Picture-in-Picture
       windowrulev2 = move 39% 39%,title:Picture-in-Picture
 
-      # Btop wallpaper specific rules
+      # Btop wallpaper specific rules - enhanced for wallpaper-like behavior
       windowrulev2 = float,class:btop-wallpaper
       windowrulev2 = pin,class:btop-wallpaper
       windowrulev2 = nofocus,class:btop-wallpaper
       windowrulev2 = noborder,class:btop-wallpaper
       windowrulev2 = noshadow,class:btop-wallpaper
       windowrulev2 = opacity 0.8,class:btop-wallpaper
+      windowrulev2 = noanim,class:btop-wallpaper
+      windowrulev2 = noinitialfocus,class:btop-wallpaper
+      windowrulev2 = minsize 1 1,class:btop-wallpaper
+      windowrulev2 = maxsize 99999 99999,class:btop-wallpaper
 
       # Power management window rules
       windowrulev2 = float,class:floating-terminal
@@ -453,9 +456,8 @@
         "dom.security.https_only_mode" = true;
         
         # Scaling optimized for Framework 13
-        "layout.css.devPixelsPerPx" = "1.426";
+        "layout.css.devPixelsPerPx" = "1.0";
         "browser.uidensity" = 0;
-        "ui.textScaleFactor" = 143;
         
         # Performance optimizations
         "browser.cache.disk.enable" = true;
@@ -480,8 +482,22 @@
         "browser.urlbar.suggest.bookmark" = true;
         "browser.urlbar.suggest.history" = true;
         "browser.urlbar.suggest.openpage" = true;
-        "layout.css.dpi" = 154;
+        "layout.css.dpi" = 0;
         "browser.zoom.full" = true;
+        "browser.display.os-zoom-behavior" = 1;
+        "browser.zoom.defaultZoom" = "1.0";
+
+        # Increase UI font size
+        "ui.textScaleFactor" =150;  # Increase from 100 to 130 (or try 140-150)
+      
+        # Force Firefox to use system font settings
+        "ui.systemUsesDarkTheme" = 1;
+        "widget.use-xdg-desktop-portal" = true;
+        "widget.use-xdg-desktop-portal.settings" = 1;
+      
+        # Ensure browser chrome uses larger fonts
+        "layout.css.text-size-adjust.enabled" = true;
+        "browser.display.use_system_colors" = true;
       };
     };
   };
@@ -489,18 +505,18 @@
   # ===== WOFI CONFIGURATION (PERFORMANCE OPTIMIZED) =====
   home.file.".config/wofi/config".text = ''
     # Performance-optimized Wofi for Framework 13
-    width=600
-    height=400
+    width=400
+    height=500
     show=drun
     mode=drun
     allow_images=true
-    image_size=32
-    columns=2
+    image_size=40
+    columns=1
     orientation=vertical
     location=center
     halign=fill
     valign=center
-    font=JetBrains Mono 12
+    font=JetBrains Mono 14
     prompt=Apps
     filter_rate=50
     allow_markup=false
@@ -675,7 +691,7 @@
 
         clock = {
           timezone = "America/New_York";
-          format = "{:%H:%M}";
+          format = "{:%I:%M %p}";  # Changed from %H:%M to %I:%M %p for 12-hour format
           format-alt = "{:%a %d %b}";
           tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
           interval = 60;
@@ -855,29 +871,29 @@
       publicShare = "$HOME/Public";
     };
     
-    # MIME type associations
-    mimeApps = {
-      enable = true;
-      defaultApplications = {
-        "text/html" = "firefox.desktop";
-        "x-scheme-handler/http" = "firefox.desktop";
-        "x-scheme-handler/https" = "firefox.desktop";
-        "x-scheme-handler/about" = "firefox.desktop";
-        "x-scheme-handler/unknown" = "firefox.desktop";
-        "application/pdf" = "firefox.desktop";
-        "image/jpeg" = "org.gnome.eog.desktop";
-        "image/png" = "org.gnome.eog.desktop";
-        "text/plain" = "code.desktop";
-        "inode/directory" = "thunar.desktop";
-      };
-    };
+    # MIME type associations - temporarily disabled to fix backup conflicts
+    # mimeApps = {
+    #   enable = true;
+    #   defaultApplications = {
+    #     "text/html" = "firefox.desktop";
+    #     "x-scheme-handler/http" = "firefox.desktop";
+    #     "x-scheme-handler/https" = "firefox.desktop";
+    #     "x-scheme-handler/about" = "firefox.desktop";
+    #     "x-scheme-handler/unknown" = "firefox.desktop";
+    #     "application/pdf" = "firefox.desktop";
+    #     "image/jpeg" = "org.gnome.eog.desktop";
+    #     "image/png" = "org.gnome.eog.desktop";
+    #     "text/plain" = "code.desktop";
+    #     "inode/directory" = "thunar.desktop";
+    #   };
+    # };
   };
 
   # ===== ADDITIONAL CONFIGURATION FILES =====
   # Hyprpaper configuration with fallback wallpaper
   home.file.".config/hypr/hyprpaper.conf".text = ''
-    preload = ~/.config/hypr/wallpaper.jpg
-    wallpaper = ,~/.config/hypr/wallpaper.jpg
+    preload = ~/.config/hypr/wallpaper.png
+    wallpaper = ,~/.config/hypr/wallpaper.png
     splash = false
     ipc = on
   '';
@@ -893,7 +909,7 @@
 
   # Swaylock configuration
   home.file.".config/swaylock/config".text = ''
-    image=~/.config/hypr/wallpaper.jpg
+    image=~/.config/hypr/wallpaper.png
     scaling=fill
     font=JetBrains Mono
     font-size=24
@@ -1034,112 +1050,6 @@
     # Performance monitoring
     iotop
     nethogs
-    
-    # Custom btop wallpaper script
-    (writeScriptBin "btop-wallpaper" ''
-      #!${runtimeShell}
-      # Btop wallpaper manager - using floating terminal approach
-      
-      show_help() {
-        echo "Btop Wallpaper Manager for Framework 13"
-        echo "Usage: btop-wallpaper [command] [options]"
-        echo ""
-        echo "Commands:"
-        echo "  start [position]  - Start btop monitor"
-        echo "  stop             - Stop btop monitor"  
-        echo "  restart [pos]    - Restart btop monitor"
-        echo "  status           - Show current status"
-        echo "  toggle           - Toggle btop monitor on/off"
-      }
-      
-      start_btop() {
-        local position=''${1:-center}
-        
-        # Kill existing instance
-        ${procps}/bin/pkill -f "kitty.*btop-wallpaper" 2>/dev/null || true
-        sleep 0.5
-        
-        # Launch btop in floating terminal with wallpaper-like properties
-        ${hyprland}/bin/hyprctl dispatch exec "${kitty}/bin/kitty --class btop-wallpaper -o font_size=11 -o background_opacity=0.8 -o window_padding_width=8 -e ${btop}/bin/btop"
-        
-        # Wait and position the window
-        sleep 2
-        case $position in
-          "corner")
-            ${hyprland}/bin/hyprctl dispatch movewindowpixel "exact 800 30,class:btop-wallpaper"
-            ${hyprland}/bin/hyprctl dispatch resizewindowpixel "exact 600 400,class:btop-wallpaper"
-            ;;
-          "left")
-            ${hyprland}/bin/hyprctl dispatch movewindowpixel "exact 30 30,class:btop-wallpaper"
-            ${hyprland}/bin/hyprctl dispatch resizewindowpixel "exact 600 500,class:btop-wallpaper"
-            ;;
-          "right")
-            ${hyprland}/bin/hyprctl dispatch movewindowpixel "exact 780 30,class:btop-wallpaper"
-            ${hyprland}/bin/hyprctl dispatch resizewindowpixel "exact 600 500,class:btop-wallpaper"
-            ;;
-          *)
-            ${hyprland}/bin/hyprctl dispatch movewindowpixel "exact 350 220,class:btop-wallpaper"
-            ${hyprland}/bin/hyprctl dispatch resizewindowpixel "exact 700 500,class:btop-wallpaper"
-            ;;
-        esac
-        
-        # Verify it started
-        sleep 1
-        if ${procps}/bin/pgrep -f "kitty.*btop-wallpaper" >/dev/null; then
-          ${libnotify}/bin/notify-send "Btop Monitor" "Started in $position position" --timeout=2000
-        else
-          ${libnotify}/bin/notify-send "Btop Monitor" "Failed to start" --urgency=critical
-        fi
-      }
-      
-      stop_btop() {
-        if ${procps}/bin/pkill -f "kitty.*btop-wallpaper" 2>/dev/null; then
-          ${libnotify}/bin/notify-send "Btop Monitor" "Stopped" --timeout=2000
-        else
-          echo "No btop monitor instance found"
-        fi
-      }
-      
-      show_status() {
-        if ${procps}/bin/pgrep -f "kitty.*btop-wallpaper" >/dev/null; then
-          echo "✅ Btop monitor is running"
-          ${hyprland}/bin/hyprctl clients | ${gnugrep}/bin/grep -A 5 "btop-wallpaper" || echo "Window info not available"
-        else
-          echo "❌ Btop monitor is not running"
-        fi
-      }
-      
-      toggle_btop() {
-        if ${procps}/bin/pgrep -f "kitty.*btop-wallpaper" >/dev/null; then
-          stop_btop
-        else
-          start_btop center
-        fi
-      }
-      
-      case "$1" in
-        "start")
-          start_btop "$2"
-          ;;
-        "stop")
-          stop_btop
-          ;;
-        "restart")
-          stop_btop
-          sleep 1
-          start_btop "$2"
-          ;;
-        "status")
-          show_status
-          ;;
-        "toggle")
-          toggle_btop
-          ;;
-        *)
-          show_help
-          ;;
-      esac
-    '')
   ];
 
   # ===== SYSTEMD USER SERVICES =====
@@ -1175,6 +1085,27 @@
         ExecStart = "${pkgs.cliphist}/bin/cliphist daemon";
         Restart = "on-failure";
         RestartSec = 3;
+      };
+      Install = {
+        WantedBy = [ "graphical-session.target" ];
+      };
+    };
+
+    # Waybar service
+    waybar = {
+      Unit = {
+        Description = "Waybar";
+        After = [ "graphical-session.target" ];
+        PartOf = [ "graphical-session.target" ];
+        Wants = [ "graphical-session.target" ];
+      };
+      Service = {
+        Type = "simple";
+        ExecStart = "${pkgs.waybar}/bin/waybar";
+        ExecReload = "${pkgs.coreutils}/bin/kill -SIGUSR2 $MAINPID";
+        Restart = "on-failure";
+        RestartSec = 3;
+        KillMode = "mixed";
       };
       Install = {
         WantedBy = [ "graphical-session.target" ];

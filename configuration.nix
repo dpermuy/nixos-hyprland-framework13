@@ -12,9 +12,10 @@ let
   };
 in
 {
-  imports = [
-    ./hardware-configuration.nix
-  ];
+
+imports = [
+  ./hardware-configuration.nix
+];
 
   # ===== BOOT CONFIGURATION =====
   boot = {
@@ -351,6 +352,7 @@ in
   
   programs.firefox.enable = true;
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.allowBroken = true;
   
   # ===== ENVIRONMENT VARIABLES =====
   environment.variables = {
@@ -472,6 +474,8 @@ in
     firefox
     cider
     steam
+    minecraft
+    gimp3-with-plugins
     
     # ===== HYPRLAND ECOSYSTEM =====
     wofi
@@ -519,6 +523,7 @@ in
     vlc
     pavucontrol
     wireplumber
+    geeqie
     
     # ===== PRODUCTIVITY =====
     libreoffice
@@ -570,20 +575,18 @@ in
     # Auto-start btop wallpaper script - simplified approach
     (writeShellScriptBin "btop-wallpaper-autostart" ''
       #!/bin/bash
-      # Auto-start btop wallpaper - simplified for plugin-based hyprwinwrap
+      # Auto-start btop wallpaper - simplified approach
       
       # Wait for Hyprland to fully load
       sleep 5
       
       # Kill any existing btop wallpaper instances
       ${pkgs.procps}/bin/pkill -f ".*btop.*wallpaper" 2>/dev/null || true
-      ${pkgs.procps}/bin/pkill -f "hyprwinwrap" 2>/dev/null || true
       
       # Wait for cleanup
       sleep 2
       
-      # Simple approach: just launch btop in a floating terminal first
-      # The windowrules will handle making it behave like wallpaper
+      # Launch btop in floating terminal - let window rules handle wallpaper behavior
       ${pkgs.hyprland}/bin/hyprctl dispatch exec "${pkgs.kitty}/bin/kitty --class btop-wallpaper -o font_size=11 -o background_opacity=0.8 -e ${pkgs.btop}/bin/btop"
       
       # Verify it started
@@ -597,97 +600,6 @@ in
       else
         ${pkgs.libnotify}/bin/notify-send "Btop Monitor" "Failed to start" --urgency=critical
       fi
-    '')
-    
-    # Enhanced btop wallpaper manager - fixed for newer Hyprland
-    (writeShellScriptBin "btop-wallpaper" ''
-      #!/bin/bash
-      # Enhanced btop wallpaper manager with auto-positioning
-      
-      show_help() {
-        echo "Btop Wallpaper Manager for Framework 13"
-        echo "Usage: btop-wallpaper [command] [options]"
-        echo ""
-        echo "Commands:"
-        echo "  start [position]  - Start btop wallpaper (positions: center, corner, left, right)"
-        echo "  stop             - Stop btop wallpaper"
-        echo "  restart [pos]    - Restart with new position"
-        echo "  status           - Show current status"
-        echo "  toggle           - Toggle btop wallpaper on/off"
-      }
-      
-      start_btop() {
-        local position=''${1:-center}
-        
-        # Kill existing instance
-        ${pkgs.procps}/bin/pkill -f "hyprwinwrap.*btop" 2>/dev/null || true
-        sleep 0.5
-        
-        # Check if hyprwinwrap is available
-        if ! command -v hyprwinwrap >/dev/null 2>&1; then
-          ${pkgs.libnotify}/bin/notify-send "Btop Wallpaper" "hyprwinwrap not available" --urgency=critical
-          return 1
-        fi
-        
-        # Launch with hyprwinwrap directly
-        hyprwinwrap --class btop-wallpaper --name 'System Monitor' -- ${pkgs.kitty}/bin/kitty --class btop-wallpaper -o font_size=11 -o background_opacity=0.8 -o window_padding_width=8 -e ${pkgs.btop}/bin/btop &
-        
-        # Verify it started
-        sleep 2
-        if ${pkgs.procps}/bin/pgrep -f "hyprwinwrap.*btop" >/dev/null; then
-          ${pkgs.libnotify}/bin/notify-send "Btop Wallpaper" "Started in $position position" --timeout=2000
-        else
-          ${pkgs.libnotify}/bin/notify-send "Btop Wallpaper" "Failed to start" --urgency=critical
-        fi
-      }
-      
-      stop_btop() {
-        if ${pkgs.procps}/bin/pkill -f "hyprwinwrap.*btop" 2>/dev/null; then
-          ${pkgs.libnotify}/bin/notify-send "Btop Wallpaper" "Stopped" --timeout=2000
-        else
-          echo "No btop wallpaper instance found"
-        fi
-      }
-      
-      show_status() {
-        if ${pkgs.procps}/bin/pgrep -f "hyprwinwrap.*btop" >/dev/null; then
-          echo "✅ Btop wallpaper is running"
-          ${pkgs.hyprland}/bin/hyprctl clients | ${pkgs.gnugrep}/bin/grep -A 5 "btop-wallpaper" || echo "Window info not available"
-        else
-          echo "❌ Btop wallpaper is not running"
-        fi
-      }
-      
-      toggle_btop() {
-        if ${pkgs.procps}/bin/pgrep -f "hyprwinwrap.*btop" >/dev/null; then
-          stop_btop
-        else
-          start_btop center
-        fi
-      }
-      
-      case "$1" in
-        "start")
-          start_btop "$2"
-          ;;
-        "stop")
-          stop_btop
-          ;;
-        "restart")
-          stop_btop
-          sleep 1
-          start_btop "$2"
-          ;;
-        "status")
-          show_status
-          ;;
-        "toggle")
-          toggle_btop
-          ;;
-        *)
-          show_help
-          ;;
-      esac
     '')
     
     # Performance monitoring script

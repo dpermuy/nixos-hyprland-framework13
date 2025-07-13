@@ -11,7 +11,7 @@
     
     # Pin Hyprland to a stable version that works with current nixpkgs
     hyprland = {
-      url = "github:hyprwm/Hyprland/v0.48.0";
+      url = "github:hyprwm/Hyprland";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
