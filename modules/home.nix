@@ -646,185 +646,298 @@
 
   # ===== WAYBAR CONFIGURATION (PERFORMANCE OPTIMIZED) =====
   programs.waybar = {
-    enable = true;
-    
-    settings = {
-      mainBar = {
-        layer = "top";
-        position = "top";
-        height = 32;
-        spacing = 0;
-        margin-top = 4;
-        margin-left = 8;
-        margin-right = 8;
-        
-        modules-left = [
-          "custom/launcher"
-          "hyprland/workspaces" 
-        ];
-        modules-center = [
-          "clock"
-        ];
-        modules-right = [
-          "pulseaudio"
-          "network"
-          "cpu"
-          "memory"
-          "battery"
-          "tray"
-          "custom/power"
-        ];
+  enable = true;
+  
+  settings = {
+    mainBar = {
+      layer = "top";
+      position = "top";
+      height = 32;
+      spacing = 0;
+      margin-top = 4;
+      margin-left = 8;
+      margin-right = 8;
+      
+      modules-left = [
+        "custom/launcher"
+        "hyprland/workspaces" 
+      ];
+      modules-center = [
+        "clock"
+      ];
+      modules-right = [
+        "pulseaudio"
+        # Removed the redundant "network" module here
+        "cpu"
+        "memory"
+        "battery"
+        "tray"
+        "custom/power"
+      ];
 
-        "custom/launcher" = {
-          format = " ";
-          on-click = "wofi --show drun";
-          tooltip = false;
-        };
+      "custom/launcher" = {
+        format = " ";
+        on-click = "wofi --show drun";
+        tooltip = false;
+      };
 
-        "hyprland/workspaces" = {
-          disable-scroll = true;
-          all-outputs = true;
-          format = "{name}";
-          on-click = "activate";
-          sort-by-number = true;
-        };
+      "hyprland/workspaces" = {
+        disable-scroll = true;
+        all-outputs = true;
+        format = "{name}";
+        on-click = "activate";
+        sort-by-number = true;
+      };
 
-        clock = {
-          timezone = "America/New_York";
-          format = "{:%I:%M %p}";  # Changed from %H:%M to %I:%M %p for 12-hour format
-          format-alt = "{:%a %d %b}";
-          tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-          interval = 60;
-        };
+      clock = {
+        timezone = "America/New_York";
+        format = "{:%I:%M %p}";
+        format-alt = "{:%a %d %b}";
+        tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+        interval = 60;
+      };
 
-        pulseaudio = {
-          scroll-step = 5;
-          format = "{icon} {volume}%";
-          format-muted = "󰖁";
-          format-icons = ["" "" ""];
-          on-click = "pavucontrol";
-          on-click-right = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
-          tooltip = false;
+      # Updated pulseaudio with volume icon
+      pulseaudio = {
+        scroll-step = 5;
+        format = "{icon} {volume}%";
+        format-muted = "󰖁 Muted";
+        format-icons = {
+          headphone = "";
+          hands-free = "";
+          headset = "";
+          phone = "";
+          portable = "";
+          car = "";
+          default = ["󰕿" "󰖀" "󰕾"];
         };
+        on-click = "pavucontrol";
+        on-click-right = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+        tooltip = true;
+        tooltip-format = "Volume: {volume}%";
+      };
 
-        network = {
-          interval = 5;
-          format-wifi = "  {signalStrength}%";
-          format-ethernet = "󰈀";
-          format-disconnected = "󰖪";
-          max-length = 20;
-          on-click = "nm-connection-editor";
-          tooltip = false;
-        };
+      # Removed the redundant network module that was here
 
-        cpu = {
-          interval = 3;
-          format = "󰍛 {usage}%";
-          max-length = 10;
-          on-click = "kitty --class btop -e btop";
-          tooltip = false;
-        };
+      cpu = {
+        interval = 3;
+        format = "󰍛 {usage}%";
+        max-length = 10;
+        on-click = "kitty --class btop -e btop";
+        tooltip = false;
+      };
 
-        memory = {
-          interval = 3;
-          format = "󰾆 {percentage}%";
-          on-click = "kitty --class btop -e btop";
-          tooltip = false;
-        };
+      memory = {
+        interval = 3;
+        format = "󰾆 {percentage}%";
+        on-click = "kitty --class btop -e btop";
+        tooltip = false;
+      };
 
-        battery = {
-          interval = 30;
-          states = {
-            warning = 30;
-            critical = 15;
-          };
-          format = "{icon} {capacity}%";
-          format-charging = "󰂄 {capacity}%";
-          format-icons = ["󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹"];
-          on-click = "power-menu-battery";
-          on-click-right = "tlp-toggle-mode";
-          tooltip = false;
+      battery = {
+        interval = 30;
+        states = {
+          warning = 30;
+          critical = 15;
         };
+        format = "{icon} {capacity}%";
+        format-charging = "󰂄 {capacity}%";
+        format-icons = ["󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹"];
+        on-click = "power-menu-battery";
+        on-click-right = "tlp-toggle-mode";
+        tooltip = false;
+      };
 
-        tray = {
-          icon-size = 14;
-          spacing = 4;
-          show-passive-items = true;
-        };
+      tray = {
+        icon-size = 14;
+        spacing = 4;
+        show-passive-items = true;
+      };
 
-        "custom/power" = {
-          format = "⏻";
-          tooltip = false;
-          on-click = "wlogout";
-          on-click-right = "systemctl poweroff";
-        };
+      # Updated power button with wlogout on left click
+      "custom/power" = {
+        format = "⏻";
+        tooltip = false;
+        on-click = "wlogout";  # Changed from systemctl poweroff
+        on-click-right = "systemctl poweroff";  # Keep emergency shutdown on right-click
       };
     };
-
-    style = ''
-      * {
-          border: none;
-          border-radius: 0;
-          font-family: "JetBrains Mono", monospace;
-          font-size: 11px;
-          min-height: 0;
-          margin: 0;
-          padding: 0;
-      }
-
-      window#waybar {
-          background: transparent;
-          color: #f8f8f2;
-      }
-
-      .modules-left,
-      .modules-center,
-      .modules-right {
-          background: rgba(40, 42, 54, 0.85);
-          border-radius: 12px;
-          margin: 0 4px;
-          padding: 0 4px;
-          border: 1px solid rgba(68, 71, 90, 0.5);
-      }
-
-      .modules-left > widget:first-child > #workspaces,
-      .modules-center > widget > #clock,
-      .modules-right > widget > * {
-          margin: 0 2px;
-          padding: 4px 8px;
-          border-radius: 8px;
-          background: transparent;
-          transition: all 0.15s ease;
-      }
-
-      #workspaces button {
-          padding: 4px 8px;
-          margin: 0 1px;
-          background: transparent;
-          color: #6272a4;
-          border-radius: 6px;
-          transition: all 0.15s ease;
-          min-width: 20px;
-      }
-
-      #workspaces button.active {
-          background: rgba(189, 147, 249, 0.3);
-          color: #bd93f9;
-      }
-
-      #clock { color: #f8f8f2; }
-      #pulseaudio { color: #ff79c6; }
-      #network { color: #50fa7b; }
-      #cpu { color: #ffb86c; }
-      #memory { color: #ff79c6; }
-      #battery { color: #50fa7b; }
-      #custom-power { color: #ff5555; }
-
-      #battery.charging { color: #f1fa8c; }
-      #battery.warning:not(.charging) { color: #ffb86c; }
-      #battery.critical:not(.charging) { color: #ff5555; }
-    '';
   };
+
+  # Updated styling to accommodate the volume icon
+  style = ''
+  * {
+      border: none;
+      border-radius: 0;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      font-weight: 500;
+      min-height: 0;
+      margin: 0;
+      padding: 0;
+  }
+
+  window#waybar {
+      background: transparent;
+      color: #f8f8f2;
+  }
+
+  .modules-left,
+  .modules-center,
+  .modules-right {
+      background: rgba(40, 42, 54, 0.85);
+      border-radius: 12px;
+      margin: 0 4px;
+      padding: 0 4px;
+      border: 1px solid rgba(68, 71, 90, 0.5);
+  }
+
+  .modules-left > widget:first-child > #workspaces,
+  .modules-center > widget > #clock,
+  .modules-right > widget > * {
+      margin: 0 2px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: transparent;
+      transition: all 0.15s ease;
+  }
+
+  /* Clean workspace styling with only valid properties */
+  #workspaces {
+      background: transparent;
+      margin: 0;
+      padding: 2px 4px;
+      border-radius: 10px;
+  }
+
+  #workspaces button {
+      min-width: 24px;
+      padding: 4px 6px;
+      margin: 0 2px;
+      background: rgba(68, 71, 90, 0.4);
+      color: #6272a4;
+      border: 1px solid rgba(98, 114, 164, 0.2);
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+  }
+
+  #workspaces button.active {
+      background: rgba(189, 147, 249, 0.4);
+      color: #bd93f9;
+      border-color: rgba(189, 147, 249, 0.6);
+      box-shadow: 0 2px 8px rgba(189, 147, 249, 0.2);
+  }
+
+  #workspaces button:hover:not(.active) {
+      background: rgba(98, 114, 164, 0.3);
+      color: #f8f8f2;
+      border-color: rgba(98, 114, 164, 0.4);
+  }
+
+  /* Framework-style launcher button - exactly matching workspace buttons */
+  #custom-launcher {
+      min-width: 24px;
+      padding: 4px 6px;
+      margin: 0 2px;
+      background: rgba(255, 159, 67, 0.3) url('/home/dylan/.config/waybar/action.png') center/16px no-repeat;
+      border: 1px solid rgba(255, 159, 67, 0.4);
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+  }
+
+  #custom-launcher:hover {
+      background: rgba(255, 159, 67, 0.5) url('/home/dylan/.config/waybar/action.png') center/16px no-repeat;
+      border-color: rgba(255, 159, 67, 0.8);
+      box-shadow: 0 2px 8px rgba(189, 147, 249, 0.2);
+  }
+
+  /* Module styling with consistent widths */
+  #clock { 
+      color: #f8f8f2; 
+      font-weight: 600;
+      padding: 4px 12px;
+      min-width: 80px;
+  }
+  
+  #pulseaudio { 
+      color: #ff79c6; 
+      min-width: 60px;
+  }
+  
+  #cpu { 
+      color: #ffb86c; 
+      min-width: 50px;
+  }
+  
+  #memory { 
+      color: #ff79c6; 
+      min-width: 50px;
+  }
+  
+  #battery { 
+      color: #50fa7b; 
+      min-width: 60px;
+  }
+  
+  #custom-power { 
+      color: #ff5555; 
+      font-size: 14px;
+      padding: 4px 8px;
+      min-width: 30px;
+  }
+
+  /* Battery state styling */
+  #battery.charging { 
+      color: #f1fa8c; 
+  }
+  
+  #battery.warning:not(.charging) { 
+      color: #ffb86c; 
+  }
+  
+  #battery.critical:not(.charging) { 
+      color: #ff5555; 
+  }
+
+  /* Audio muted styling */
+  #pulseaudio.muted {
+      background-color: rgba(255, 85, 85, 0.2);
+      color: #ff5555;
+      border-radius: 6px;
+  }
+
+  /* Tray styling */
+  #tray {
+      padding: 2px 6px;
+  }
+
+  #tray > .passive {
+      -gtk-icon-effect: dim;
+  }
+
+  #tray > .needs-attention {
+      -gtk-icon-effect: highlight;
+      background-color: rgba(255, 85, 85, 0.3);
+      border-radius: 4px;
+  }
+
+  /* Simple hover effects without transform */
+  #clock:hover,
+  #pulseaudio:hover,
+  #cpu:hover,
+  #memory:hover,
+  #battery:hover,
+  #custom-power:hover {
+      background: rgba(68, 71, 90, 0.4);
+      border-radius: 6px;
+  }
+'';
+};
+
 
   # ===== GTK CONFIGURATION =====
   gtk = {
@@ -892,6 +1005,7 @@
   # ===== ADDITIONAL CONFIGURATION FILES =====
   # Hyprpaper configuration with fallback wallpaper
   home.file.".config/hypr/hyprpaper.conf".text = ''
+  home.file.".config/waybar/action.png".source = ~/nixos-hyprland-framework13/modules/action.png
     preload = ~/.config/hypr/wallpaper.png
     wallpaper = ,~/.config/hypr/wallpaper.png
     splash = false

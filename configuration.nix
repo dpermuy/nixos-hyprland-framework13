@@ -371,8 +371,8 @@ imports = [
     QT_QPA_PLATFORM = "wayland;xcb";
     
     # Cursor configuration
-    XCURSOR_THEME = "Nordzy-cursors";
-    XCURSOR_SIZE = "40";
+    XCURSOR_THEME = "macOS-BigSur";
+    XCURSOR_SIZE = "24";
     
     # Performance optimizations
     WINIT_X11_SCALE_FACTOR = "1.6";
@@ -389,19 +389,19 @@ imports = [
 
   # ===== GTK CURSOR CONFIGURATION =====
   environment.etc = {
-    "gtk-2.0/gtkrc".text = ''
-      gtk-cursor-theme-name="Nordzy-cursors"
-      gtk-cursor-theme-size=40
+      "gtk-2.0/gtkrc".text = ''
+      gtk-cursor-theme-name="macOS-BigSur"
+      gtk-cursor-theme-size=24
     '';
     "gtk-3.0/settings.ini".text = ''
       [Settings]
-      gtk-cursor-theme-name=Nordzy-cursors
-      gtk-cursor-theme-size=40
+      gtk-cursor-theme-name=macOS-BigSur
+      gtk-cursor-theme-size=24
     '';
     "xdg/gtk-3.0/settings.ini".text = ''
       [Settings]
-      gtk-cursor-theme-name=Nordzy-cursors
-      gtk-cursor-theme-size=40
+      gtk-cursor-theme-name=macOS-BigSur
+      gtk-cursor-theme-size=24
     '';
     "modprobe.d/amdgpu.conf".text = ''
       options amdgpu deep_color=1
@@ -475,7 +475,6 @@ imports = [
     firefox
     cider
     steam
-    minecraft
     gimp3-with-plugins
     
     # ===== HYPRLAND ECOSYSTEM =====
@@ -561,7 +560,7 @@ imports = [
     busybox
     
     # ===== CURSORS AND THEMES =====
-    nordzy-cursor-theme
+    apple-cursor
     bibata-cursors
     gnome-themes-extra
     papirus-icon-theme
