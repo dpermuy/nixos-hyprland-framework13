@@ -137,8 +137,11 @@ imports = [
     ];
   };
 
+  # Enable MATE
+  services.xserver.desktopManager.mate.enable = true;
+
   # Disable other desktop environments
-  services.desktopManager.plasma6.enable = false;
+  services.xserver.desktopManager.plasma6.enable = false;
   
   # SDDM display manager with custom theme
   services.displayManager.sddm = {
@@ -565,6 +568,12 @@ imports = [
     gnome-themes-extra
     papirus-icon-theme
     
+    # Optional MATE applications
+    mate.caja              # File manager
+    mate.mate-terminal     # Terminal  
+    mate.mate-calc         # Calculator
+    mate.pluma             # Text editor
+
     # ===== AUTHENTICATION =====
     libsForQt5.polkit-kde-agent
     
