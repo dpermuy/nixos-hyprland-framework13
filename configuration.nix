@@ -469,6 +469,7 @@ services.xserver.dpi = 220;
     lf
     figlet
     tree
+    fortune
     
     # ===== NETWORK MANAGEMENT =====
     networkmanagerapplet
