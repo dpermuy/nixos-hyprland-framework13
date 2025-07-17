@@ -139,9 +139,13 @@ imports = [
 
   # Enable MATE
   services.xserver.desktopManager.mate.enable = true;
+  
+
+# X11 DPI setting for MATE
+services.xserver.dpi = 220;
 
   # Disable other desktop environments
-  services.xserver.desktopManager.plasma6.enable = false;
+  services.desktopManager.plasma6.enable = false;
   
   # SDDM display manager with custom theme
   services.displayManager.sddm = {
@@ -573,6 +577,9 @@ imports = [
     mate.mate-terminal     # Terminal  
     mate.mate-calc         # Calculator
     mate.pluma             # Text editor
+    xorg.xdpyinfo
+    bc          # Calculator for DPI calculations
+    xorg.xrandr    # X RandR extension
 
     # ===== AUTHENTICATION =====
     libsForQt5.polkit-kde-agent
@@ -581,6 +588,57 @@ imports = [
     swaybg
     
     # ===== CUSTOM SCRIPTS =====
+
+  (writeShellScriptBin "code-mate-fixed" ''
+  #!/bin/bash
+  
+  # Parse zoom level from arguments (default to 8 for Framework 13 MATE)
+  ZOOM_LEVEL=8
+  ARGS=()
+  
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      --zoom-level=*)
+        ZOOM_LEVEL="''${1#*=}"
+        shift
+        ;;
+      --zoom-level)
+        ZOOM_LEVEL="$2"
+        shift 2
+        ;;
+      *)
+        ARGS+=("$1")
+        shift
+        ;;
+    esac
+  done
+  
+  echo "Setting up VS Code for Framework 13 in MATE (zoom: $ZOOM_LEVEL)..."
+  
+  # Completely clear Hyprland scaling variables
+  unset GDK_SCALE
+  unset GDK_DPI_SCALE  
+  unset QT_SCALE_FACTOR
+  unset QT_FONT_DPI
+  unset QT_AUTO_SCREEN_SCALE_FACTOR
+  unset WINIT_X11_SCALE_FACTOR
+  unset _JAVA_OPTIONS
+  
+  # Set standard scaling for MATE
+  export GDK_SCALE=1.0
+  export GDK_DPI_SCALE=1.0
+  export QT_SCALE_FACTOR=1.0
+  export QT_FONT_DPI=96
+  
+  # Launch VS Code with zoom level 8 (matches MATE app scaling)
+  exec ${pkgs.vscode}/bin/code \
+    --force-device-scale-factor=1.0 \
+    --zoom-level=$ZOOM_LEVEL \
+    --disable-features=UseOzonePlatform \
+    --ozone-platform=x11 \
+    "''${ARGS[@]}"
+'')
+
     # Auto-start btop wallpaper script - simplified approach
     (writeShellScriptBin "btop-wallpaper-autostart" ''
       #!/bin/bash
@@ -877,6 +935,57 @@ imports = [
           ;;
       esac
     '')
+
+# Check DPI script
+    (writeShellScriptBin "check-dpi" ''
+  #!/bin/bash
+  echo "=== DPI Diagnostic Information ==="
+  echo "Date: $(date)"
+  echo "Desktop Environment: $XDG_CURRENT_DESKTOP"
+  echo ""
+  
+  echo "=== Environment Variables ==="
+  echo "GDK_SCALE: $GDK_SCALE"
+  echo "GDK_DPI_SCALE: $GDK_DPI_SCALE"
+  echo "QT_SCALE_FACTOR: $QT_SCALE_FACTOR"
+  echo "QT_FONT_DPI: $QT_FONT_DPI"
+  echo ""
+  
+  echo "=== X11 DPI Information ==="
+  if command -v xdpyinfo >/dev/null 2>&1; then
+    xdpyinfo | grep -E "dimensions|resolution"
+  else
+    echo "xdpyinfo not available"
+  fi
+  echo ""
+  
+  echo "=== MATE DPI Settings ==="
+  if command -v gsettings >/dev/null 2>&1; then
+    echo "MATE Interface scaling: $(gsettings get org.mate.interface scaling-factor 2>/dev/null || echo 'N/A')"
+    echo "MATE Font DPI: $(gsettings get org.mate.font-rendering dpi 2>/dev/null || echo 'N/A')"
+    echo "MATE Window scaling: $(gsettings get org.mate.Marco.general compositing-manager 2>/dev/null || echo 'N/A')"
+  else
+    echo "gsettings not available"
+  fi
+  echo ""
+  
+  echo "=== Calculated DPI ==="
+  if command -v xrandr >/dev/null 2>&1; then
+    # Get screen resolution and physical size
+    xrandr | grep -A1 "connected primary" | tail -1 | grep -o '[0-9]*x[0-9]*' | head -1
+    echo "Monitor info:"
+    xrandr | grep "connected primary"
+  else
+    echo "xrandr not available"
+  fi
+  echo ""
+  
+  echo "=== Font Configuration ==="
+  if command -v fc-match >/dev/null 2>&1; then
+    echo "Default font: $(fc-match sans-serif)"
+    echo "Monospace font: $(fc-match monospace)"
+  fi
+'')
   ];
 
   # ===== XDG PORTAL CONFIGURATION =====

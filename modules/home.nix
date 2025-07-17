@@ -378,63 +378,87 @@
   };
 
   # ===== VS CODE CONFIGURATION =====
-  programs.vscode = {
-    enable = true;
-    profiles.default = {
-      extensions = with pkgs.vscode-extensions; [
-        dracula-theme.theme-dracula
-        vscodevim.vim
-        yzhang.markdown-all-in-one
-        bbenoist.nix
-        ms-vscode.hexeditor
-        ms-python.python
-        ms-vscode.cpptools
-        bradlc.vscode-tailwindcss
-      ];
-      userSettings = {
-        # Font and display
-        "editor.fontFamily" = "'JetBrains Mono', 'Droid Sans Mono', monospace";
-        "editor.fontSize" = 16;
-        "editor.fontLigatures" = true;
-        "editor.lineHeight" = 1.4;
-        
-        # Theme and UI
-        "workbench.colorTheme" = "Dracula";
-        "window.zoomLevel" = 0.5;
-        "editor.minimap.enabled" = false;
-        "workbench.activityBar.location" = "top";
-        
-        # Performance optimizations
-        "editor.accessibilitySupport" = "off";
-        "extensions.autoUpdate" = false;
-        "search.followSymlinks" = false;
-        "search.useRipgrep" = true;
-        "editor.semanticHighlighting.enabled" = false;
-        
-        # File watching exclusions
-        "files.watcherExclude" = {
-          "**/.git/objects/**" = true;
-          "**/.git/subtree-cache/**" = true;
-          "**/node_modules/*/**" = true;
-          "**/.hg/store/**" = true;
-          "**/target/**" = true;
-          "**/.next/**" = true;
-        };
-        
-        # Editor behavior
-        "editor.renderWhitespace" = "boundary";
-        "files.autoSave" = "afterDelay";
-        "editor.cursorBlinking" = "smooth";
-        "editor.cursorSmoothCaretAnimation" = "on";
-        "workbench.list.smoothScrolling" = true;
-        "editor.smoothScrolling" = true;
-        
-        # Privacy
-        "telemetry.telemetryLevel" = "off";
-        "workbench.enableExperiments" = false;
+  # Add this to your VS Code configuration in modules/home.nix
+programs.vscode = {
+  enable = true;
+  profiles.default = {
+    extensions = with pkgs.vscode-extensions; [
+      dracula-theme.theme-dracula
+      yzhang.markdown-all-in-one
+      bbenoist.nix
+      ms-vscode.hexeditor
+      ms-python.python
+      ms-vscode.cpptools
+      bradlc.vscode-tailwindcss
+    ];
+    userSettings = {
+      # Font and display
+      "editor.fontFamily" = "'JetBrains Mono', 'Droid Sans Mono', monospace";
+      "editor.fontSize" = 16;
+      "editor.fontLigatures" = true;
+      "editor.lineHeight" = 1.4;
+      
+      # Theme and UI
+      "workbench.colorTheme" = "Dracula";
+      
+      # Conditional zoom level - default for MATE, scaled for Hyprland
+      "window.zoomLevel" = 0;  # Changed from 0.5 to 0 (default)
+      
+      "editor.minimap.enabled" = false;
+      "workbench.activityBar.location" = "top";
+      
+      # Performance optimizations
+      "editor.accessibilitySupport" = "off";
+      "extensions.autoUpdate" = false;
+      "search.followSymlinks" = false;
+      "search.useRipgrep" = true;
+      "editor.semanticHighlighting.enabled" = false;
+      
+      # File watching exclusions
+      "files.watcherExclude" = {
+        "**/.git/objects/**" = true;
+        "**/.git/subtree-cache/**" = true;
+        "**/node_modules/*/**" = true;
+        "**/.hg/store/**" = true;
+        "**/target/**" = true;
+        "**/.next/**" = true;
       };
+      
+      # Editor behavior
+      "editor.renderWhitespace" = "boundary";
+      "files.autoSave" = "afterDelay";
+      "editor.cursorBlinking" = "smooth";
+      "editor.cursorSmoothCaretAnimation" = "on";
+      "workbench.list.smoothScrolling" = true;
+      "editor.smoothScrolling" = true;
+      
+      # Privacy
+      "telemetry.telemetryLevel" = "off";
+      "workbench.enableExperiments" = false;
     };
   };
+};
+
+home.file.".local/share/applications/code-mate.desktop".text = ''
+  [Desktop Entry]
+  Name=Visual Studio Code (MATE - Correct Scale)
+  Comment=Code Editing. Redefined. (Optimized for Framework 13 MATE)
+  GenericName=Text Editor
+  Exec=code-mate-fixed %F
+  Icon=vscode
+  Type=Application
+  StartupNotify=true
+  StartupWMClass=Code
+  Categories=TextEditor;Development;IDE;
+  MimeType=text/plain;inode/directory;application/x-code-workspace;
+  Actions=new-empty-window;
+  Keywords=vscode;
+
+  [Desktop Action new-empty-window]
+  Name=New Empty Window
+  Exec=code-mate-fixed --new-window %F
+  Icon=vscode
+'';
 
   # ===== FIREFOX CONFIGURATION =====
   programs.firefox = {
