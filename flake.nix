@@ -1,53 +1,37 @@
 {
-  description = "Framework 13 AMD NixOS Configuration with Hyprland";
+  description = "NixOS configuration for Framework 13 AMD";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    
-    # Pin Hyprland to a stable version that works with current nixpkgs
     hyprland = {
       url = "github:hyprwm/Hyprland";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, hyprland, ... }@inputs:
-  let
-    system = "x86_64-linux";
-    pkgs = nixpkgs.legacyPackages.${system};
-  in
+  outputs = { self, nixpkgs, nixos-hardware, home-manager, hyprland, ... }:
   {
-    nixosConfigurations = {
-      framework = nixpkgs.lib.nixosSystem {
-        inherit system;
-        specialArgs = { inherit inputs; };
-        modules = [
-          ./configuration.nix
-          
-          # Hyprland configuration
-          hyprland.nixosModules.default
-          { programs.hyprland.enable = true; }
-          
-          # Home Manager configuration
-          home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              backupFileExtension = "backup";
-              users.dylan = import ./modules/home.nix;
-              extraSpecialArgs = { 
-                inherit hyprland;
-              };
-            };
-          }
-        ];
-      };
+    nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        ./configuration.nix
+        nixos-hardware.nixosModules.framework-13-7040-amd
+        home-manager.nixosModules.home-manager
+        hyprland.nixosModules.default
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.users.dylan = import ./home.nix;
+          home-manager.extraSpecialArgs = {
+            inherit hyprland;
+          };
+        }
+      ];
     };
   };
 }

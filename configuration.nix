@@ -1,9 +1,7 @@
-# Complete enhanced configuration.nix for Framework 13 AMD with Hyprland optimizations
-# Fixed syntax errors and proper Nix escaping
+# Complete configuration.nix for Framework 13 AMD
 { config, pkgs, lib, ... }:
 
 let
-  # SDDM theme
   minesddm = pkgs.fetchFromGitHub {
     owner = "Davi-S";
     repo = "sddm-theme-minesddm";
@@ -12,142 +10,73 @@ let
   };
 in
 {
-
-imports = [
-  ./hardware-configuration.nix
-];
-
-  # ===== BOOT CONFIGURATION =====
-  boot = {
-    loader = {
-      systemd-boot.enable = true;
-      efi.canTouchEfiVariables = true;
-    };
-
-    # Framework 13 AMD specific kernel parameters for optimal performance
-    kernelParams = [
-      "amd_pstate=active"
-      "nvme.noacpi=1"
-      "acpi_osi=Linux"
-      "acpi_backlight=native"
-      # Performance optimizations
-      "mitigations=off"
-      "processor.max_cstate=1"
+  imports =
+    [ # Include the results of the hardware scan and Framework hardware
+      ./hardware-configuration.nix
     ];
-    
-    kernelModules = [ "kvm-amd" ];
-    
-    # AMD GPU optimizations
-    extraModprobeConfig = ''
-      options amdgpu deep_color=1
-      options amdgpu dc=1
-      options amdgpu hwmon=1
-      options amdgpu gpu_recovery=1
-      options amdgpu noretry=0
-    '';
 
-    # Kernel sysctl optimizations for responsiveness
-    kernel.sysctl = {
-      # Network performance
-      "net.core.default_qdisc" = "cake";
-      "net.ipv4.tcp_congestion_control" = "bbr";
-      
-      # Memory management for SSD
-      "vm.swappiness" = 10;
-      "vm.dirty_ratio" = 15;
-      "vm.dirty_background_ratio" = 5;
-      
-      # Responsiveness optimizations
-      "kernel.sched_autogroup_enabled" = 0;
-      "kernel.sched_child_runs_first" = 0;
-    };
-  };
+  # Bootloader configuration
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
 
-  # ===== NETWORKING =====
-  networking = {
-    hostName = "nixos";
-    networkmanager.enable = true;
-    # Performance optimization
-    networkmanager.wifi.powersave = false;
-  };
+  # Framework-specific kernel parameters
+  boot.kernelParams = [
+    "amd_pstate=active"   # Better CPU frequency scaling
+    "nvme.noacpi=1"       # Fix potential NVMe issues
+    "acpi_osi=Linux"      # Better ACPI compatibility
+    "acpi_backlight=native" # Better backlight control
+  ];
+  
+  # Enable AMD virtualization support
+  boot.kernelModules = [ "kvm-amd" ];
+  
+  # Extra module config for AMD GPU
+  boot.extraModprobeConfig = ''
+    options amdgpu deep_color=1
+    options amdgpu dc=1
+    options amdgpu hwmon=1
+  '';
 
-  # ===== NIX SETTINGS =====
-  nix = {
-    settings = {
-      experimental-features = [ "nix-command" "flakes" ];
-      download-buffer-size = 10485760;
-      max-jobs = "auto";
-      cores = 0;
-      auto-optimise-store = true;
-      
-      # Performance optimizations
-      keep-outputs = true;
-      keep-derivations = true;
-      
-      trusted-substituters = [
-        "https://cache.nixos.org"
-        "https://nix-community.cachix.org"
-        "https://hyprland.cachix.org"
-      ];
-      trusted-public-keys = [
-        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-        "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
-      ];
-    };
-    
-    # Garbage collection optimization
-    gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 14d";
-    };
-    
-    optimise.automatic = true;
-  };
+  # Networking configuration
+  networking.hostName = "nixos"; # Define your hostname
+  networking.networkmanager.enable = true;
 
-  # ===== LOCALE AND TIME =====
+  # Enable experimental Nix features (flakes and nix commands)
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  # Time zone and locale settings
   time.timeZone = "America/New_York";
-  i18n = {
-    defaultLocale = "en_US.UTF-8";
-    extraLocaleSettings = {
-      LC_ADDRESS = "en_US.UTF-8";
-      LC_IDENTIFICATION = "en_US.UTF-8";
-      LC_MEASUREMENT = "en_US.UTF-8";
-      LC_MONETARY = "en_US.UTF-8";
-      LC_NAME = "en_US.UTF-8";
-      LC_NUMERIC = "en_US.UTF-8";
-      LC_PAPER = "en_US.UTF-8";
-      LC_TELEPHONE = "en_US.UTF-8";
-      LC_TIME = "en_US.UTF-8";
-    };
+  i18n.defaultLocale = "en_US.UTF-8";
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "en_US.UTF-8";
+    LC_IDENTIFICATION = "en_US.UTF-8";
+    LC_MEASUREMENT = "en_US.UTF-8";
+    LC_MONETARY = "en_US.UTF-8";
+    LC_NAME = "en_US.UTF-8";
+    LC_NUMERIC = "en_US.UTF-8";
+    LC_PAPER = "en_US.UTF-8";
+    LC_TELEPHONE = "en_US.UTF-8";
+    LC_TIME = "en_US.UTF-8";
   };
 
-  # ===== DISPLAY AND DESKTOP ENVIRONMENT =====
+  # Enable the X11 windowing system and Wayland
   services.xserver.enable = true;
   
-  # Hyprland with official plugins
+  # Enable Hyprland Wayland compositor
   programs.hyprland = {
+
+  # Enable MATE Desktop alongside Hyprland
+  services.xserver.desktopManager.mate.enable = true;
+  services.xserver.dpi = 220;  # HiDPI for Framework 13
     enable = true;
     xwayland.enable = true;
-    # Enable official plugins from nixpkgs
-    plugins = [
-      pkgs.hyprlandPlugins.hyprspace      # Workspace overview
-      pkgs.hyprlandPlugins.hyprwinwrap    # Window wrapping for btop wallpaper
-    ];
+    extraConfig = "monitor=eDP-1,2256x1504@60,0x0,1.5";
   };
 
-  # Enable MATE
-  services.xserver.desktopManager.mate.enable = true;
-  
-
-# X11 DPI setting for MATE
-services.xserver.dpi = 220;
-
-  # Disable other desktop environments
+  # Disable KDE Plasma
   services.desktopManager.plasma6.enable = false;
   
-  # SDDM display manager with custom theme
+  # SDDM Configuration with minesddm theme
   services.displayManager.sddm = {
     enable = true;
     theme = "minesddm";
@@ -157,19 +86,48 @@ services.xserver.dpi = 220;
         CursorSize = "32";
         ThemeDir = "${minesddm}";
       };
-      General = {
-        GreeterEnvironment = "QT_SCREEN_SCALE_FACTORS=1.6,QT_FONT_DPI=154";
-      };
     };
   };
 
-  # ===== INPUT CONFIGURATION =====
+  # Configure power button behavior
+  services.logind = {
+    lidSwitch = "suspend";
+    lidSwitchExternalPower = "lock";
+    extraConfig = ''
+      HandlePowerKey=ignore
+      HandlePowerKeyLongPress=poweroff
+      IdleAction=suspend
+      IdleActionSec=300
+    '';
+  };
+
+  # Add ACPI event handling
+  services.acpid = {
+    enable = true;
+    handlers = {
+      power-button = {
+        event = "button/power.*";
+        action = "${pkgs.writeShellScript "power-button-action" ''
+          /run/current-system/sw/bin/power-menu
+        ''}";
+      };
+    };
+  };
+  
+  # Framework keyboard function keys support
+  services.udev.extraRules = ''
+    # Framework laptop keyboard function keys
+    SUBSYSTEM=="input", ATTRS{name}=="HPDL0001:00 04F3:324B", ENV{KEYBOARD_KEY_70039}="keyboardbacklightdown"
+    SUBSYSTEM=="input", ATTRS{name}=="HPDL0001:00 04F3:324B", ENV{KEYBOARD_KEY_7003a}="keyboardbacklightup"
+  '';
+  
+  # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
     variant = "";
   };
 
-  # Enhanced touchpad configuration with gesture support
+  # Touchpad configuration
   services.libinput = {
     enable = true;
     touchpad = {
@@ -178,118 +136,59 @@ services.xserver.dpi = 220;
       disableWhileTyping = true;
       clickMethod = "clickfinger";
       accelSpeed = "0.3";
-      # Enable advanced gesture support
-      additionalOptions = ''
-        Option "TappingDrag" "false"
-        Option "TappingDragLock" "false" 
-        Option "ClickMethod" "clickfinger"
-        Option "PalmDetection" "on"
-        Option "PalmMinWidth" "8"
-        Option "PalmMinZ" "100"
-        Option "CoastingSpeed" "20"
-        Option "CoastingFriction" "50"
-        Option "PressureMotionMinZ" "30"
-        Option "PressureMotionMaxZ" "160"
-        Option "PressureMotionMinFactor" "1"
-        Option "PressureMotionMaxFactor" "1"
-        Option "GrabEventDevice" "false"
-      '';
-    };
-  };
-
-  # ===== POWER MANAGEMENT =====
-  services.logind = {
-    lidSwitch = "suspend";
-    lidSwitchExternalPower = "lock";
-    extraConfig = ''
-      HandlePowerKey=ignore
-      HandlePowerKeyLongPress=poweroff
-      IdleAction=suspend
-      IdleActionSec=600
-      RuntimeDirectorySize=2G
-    '';
-  };
-
-  services.acpid = {
-    enable = true;
-    handlers = {
-      power-button = {
-        event = "button/power.*";
-        action = "${pkgs.writeShellScript "power-button-action" ''
-          ${pkgs.wlogout}/bin/wlogout
-        ''}";
-      };
     };
   };
   
-  # TLP power management for Framework 13
+  # POWER MANAGEMENT
   services.tlp = {
     enable = true;
     settings = {
-      # CPU scaling
       CPU_SCALING_GOVERNOR_ON_AC = "performance";
       CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
       CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
       CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
       
-      # Platform profiles
+      # AMD-specific settings
       PLATFORM_PROFILE_ON_AC = "performance";
       PLATFORM_PROFILE_ON_BAT = "low-power";
       
-      # Battery charge thresholds for longevity
+      # Battery charge thresholds (customize to your preference)
       START_CHARGE_THRESH_BAT0 = 75;
       STOP_CHARGE_THRESH_BAT0 = 90;
-      
-      # USB/PCI power management
-      USB_AUTOSUSPEND = 1;
-      USB_BLACKLIST_PHONE = 1;
-      
-      # Runtime power management
-      RUNTIME_PM_ON_AC = "auto";
-      RUNTIME_PM_ON_BAT = "auto";
-      
-      # WiFi power saving
-      WIFI_PWR_ON_AC = "off";
-      WIFI_PWR_ON_BAT = "on";
     };
   };
   
+  # Better temperature management for AMD
   services.thermald.enable = true;
+  
+  # Enable Power-Profiles-Daemon
   services.power-profiles-daemon.enable = false;
-
-  # ===== PRINTING =====
+  
+  # Enable CUPS for printing
   services.printing = {
     enable = true;
     drivers = [ pkgs.gutenprint pkgs.hplip ];
   };
 
+  # Enable network discovery of printers and services
   services.avahi = {
     enable = true;
     nssmdns4 = true;
     openFirewall = true;
   };
   
-  # ===== AUDIO =====
+  # Enable sound with pipewire
   services.pulseaudio.enable = false;
+  security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
     jack.enable = true;
-    
-    # Performance optimizations
-    extraConfig.pipewire."92-low-latency" = {
-      context.properties = {
-        default.clock.rate = 48000;
-        default.clock.quantum = 32;
-        default.clock.min-quantum = 32;
-        default.clock.max-quantum = 32;
-      };
-    };
   };
 
-  # ===== BLUETOOTH =====
+  # Enable bluetooth
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
@@ -297,718 +196,253 @@ services.xserver.dpi = 220;
       General = {
         Enable = "Source,Sink,Media,Socket";
         Experimental = true;
-        FastConnectable = true;
-        ReconnectAttempts = 7;
-        ReconnectIntervals = "1, 2, 4, 8, 16, 32, 64";
       };
     };
   };
   
-  # ===== GRAPHICS =====
+  # Enable fingerprint reader (uncomment if you have one)
+  # services.fprintd.enable = true;
+
+  # Configure graphics drivers for AMD
   hardware.graphics = {
     enable = true;
-    enable32Bit = true;
     extraPackages = with pkgs; [
       amdvlk
-      rocmPackages.clr
-      rocmPackages.rocm-runtime
-      mesa  # Updated from mesa.drivers
-    ];
-    extraPackages32 = with pkgs.pkgsi686Linux; [
-      amdvlk
     ];
   };
-
-  # ===== SECURITY =====
-  security = {
-    rtkit.enable = true;
-    polkit.enable = true;
-    pam.loginLimits = [
-      { domain = "@users"; item = "rtprio"; type = "-"; value = 1; }
-    ];
-  };
-
-  # ===== SYSTEM MAINTENANCE =====
+  
+  # AUTO-UPDATES AND MAINTENANCE
   system.autoUpgrade = {
     enable = true;
     allowReboot = false;
     dates = "weekly";
-    flake = "/etc/nixos";
   };
 
-  services.flatpak.enable = true;
-  services.fstrim.enable = true;
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 14d";
+  };
 
-  # ===== USER CONFIGURATION =====
+  nix.optimise.automatic = true;
+  
+  # Enable flatpak for additional applications
+  services.flatpak.enable = true;
+
+  # Define a user account
   users.users.dylan = {
     isNormalUser = true;
     description = "dylan";
-    extraGroups = [ 
-      "networkmanager" 
-      "wheel" 
-      "video" 
-      "audio" 
-      "input"
-      "render"
-      "disk"
-    ];
+    extraGroups = [ "networkmanager" "wheel" "video" "audio" "input" ];
     packages = with pkgs; [
       kdePackages.kate
     ];
   };
   
+  # Install firefox
   programs.firefox.enable = true;
-  nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.allowBroken = true;
   
-  # ===== ENVIRONMENT VARIABLES =====
+  # Enable zsh
+  programs.zsh.enable = true;
+  
+  # Allow unfree packages
+  nixpkgs.config.allowUnfree = true;
+  
+  # HiDPI cursor overlay 
+  nixpkgs.overlays = [
+    (final: prev: {
+      gnome = prev.gnome // {
+        adwaita-icon-theme = prev.gnome.adwaita-icon-theme.overrideAttrs (oldAttrs: {
+          postInstall = (oldAttrs.postInstall or "") + ''
+            # Fix cursor sizes for HiDPI displays
+            for size in 24 32 48 64 96; do
+              cd $out/share/icons/Adwaita/''${size}x''${size}/cursors
+              for cursor in *; do
+                if [ -f "$cursor" ]; then
+                  echo "Fixing cursor size for $cursor (''${size}px)"
+                  ${prev.xcursorgen}/bin/xcursorgen -size ''${size} "$cursor" "$cursor.new"
+                  mv "$cursor.new" "$cursor"
+                fi
+              done
+            done
+          '';
+        });
+      };
+    })
+  ];
+
+  # Environment variables for better HiDPI and Wayland support
   environment.variables = {
-    # Wayland optimizations
+    # Wayland specific
     MOZ_ENABLE_WAYLAND = "1";
     MOZ_USE_XINPUT2 = "1";
     WLR_NO_HARDWARE_CURSORS = "1";
-    WLR_RENDERER_ALLOW_SOFTWARE = "1";
     
-    # HiDPI settings for 1.6x scaling
-    GDK_SCALE = "1.6"; 
-    GDK_DPI_SCALE = "0.625";
+    # HiDPI settings for consistent scaling
+    GDK_SCALE = "1.5"; 
+    GDK_DPI_SCALE = "0.75";
     QT_AUTO_SCREEN_SCALE_FACTOR = "1";
-    QT_SCALE_FACTOR = "1.6";
-    QT_FONT_DPI = "154";
-    QT_QPA_PLATFORM = "wayland;xcb";
+    QT_SCALE_FACTOR = "1.5";
     
     # Cursor configuration
-    XCURSOR_THEME = "macOS-BigSur";
-    XCURSOR_SIZE = "24";
-    
-    # Performance optimizations
-    WINIT_X11_SCALE_FACTOR = "1.6";
-    _JAVA_OPTIONS = "-Dsun.java2d.uiScale=1.6";
-    
-    # Wayland-specific
-    SDL_VIDEODRIVER = "wayland,x11";
-    CLUTTER_BACKEND = "wayland";
-    
-    # Hardware acceleration
-    LIBVA_DRIVER_NAME = "radeonsi";
-    VDPAU_DRIVER = "radeonsi";
-  };
-
-  # ===== GTK CURSOR CONFIGURATION =====
-  environment.etc = {
-      "gtk-2.0/gtkrc".text = ''
-      gtk-cursor-theme-name="macOS-BigSur"
-      gtk-cursor-theme-size=24
-    '';
-    "gtk-3.0/settings.ini".text = ''
-      [Settings]
-      gtk-cursor-theme-name=macOS-BigSur
-      gtk-cursor-theme-size=24
-    '';
-    "xdg/gtk-3.0/settings.ini".text = ''
-      [Settings]
-      gtk-cursor-theme-name=macOS-BigSur
-      gtk-cursor-theme-size=24
-    '';
-    "modprobe.d/amdgpu.conf".text = ''
-      options amdgpu deep_color=1
-      options amdgpu dc=1
-      options amdgpu gpu_recovery=1
-      options amdgpu mes=1
-      options amdgpu noretry=0
-    '';
-  };
-
-  # ===== FONTS =====
-  fonts = {
-    packages = with pkgs; [
-      # Core fonts
-      font-awesome
-      jetbrains-mono
-      noto-fonts
-      noto-fonts-cjk-sans
-      noto-fonts-emoji
-      liberation_ttf
-      fira-code
-      fira-code-symbols
-      
-      # Additional fonts
-      inter
-      roboto
-      ubuntu_font_family
-      
-      # Nerd fonts - updated syntax for new nerd-fonts structure
-      nerd-fonts.jetbrains-mono
-      nerd-fonts.fira-code
-      nerd-fonts.hack
-    ];
-    
-    fontconfig = {
-      enable = true;
-      defaultFonts = {
-        serif = [ "Liberation Serif" "Noto Serif" ];
-        sansSerif = [ "Inter" "Liberation Sans" "Noto Sans" ];
-        monospace = [ "JetBrains Mono" "Liberation Mono" "Noto Sans Mono" ];
-        emoji = [ "Noto Color Emoji" ];
-      };
-    };
+    XCURSOR_THEME = "Nordzy-cursors";
+    XCURSOR_SIZE = "32";
   };
   
-  # ===== SYSTEM PACKAGES =====
+  # Make cursor configuration consistent
+  environment.etc."gtk-2.0/gtkrc".text = ''
+    gtk-cursor-theme-name="Nordzy-cursors"
+    gtk-cursor-theme-size=32
+  '';
+  environment.etc."gtk-3.0/settings.ini".text = ''
+    [Settings]
+    gtk-cursor-theme-name=Nordzy-cursors
+    gtk-cursor-theme-size=32
+  '';
+  environment.etc."xdg/gtk-3.0/settings.ini".text = ''
+    [Settings]
+    gtk-cursor-theme-name=Nordzy-cursors
+    gtk-cursor-theme-size=32
+  '';
+  
+  # Font configuration
+  fonts.packages = with pkgs; [
+    font-awesome
+    jetbrains-mono
+    noto-fonts
+    noto-fonts-cjk-sans
+    noto-fonts-emoji
+    liberation_ttf
+    fira-code
+    fira-code-symbols
+    mplus-outline-fonts.githubRelease
+    dina-font
+    proggyfonts
+  ] ++ builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
+  
+  # System packages
+    # MATE Desktop applications
+    mate.caja              # File manager
+    mate.mate-terminal     # Terminal
+    mate.mate-calc         # Calculator
+    mate.pluma             # Text editor
   environment.systemPackages = with pkgs; [
-    # ===== TERMINAL EMULATORS =====
+    # Terminal emulators
     kitty
     ghostty
     
-    # ===== DEVELOPMENT TOOLS =====
+    # Development tools
     git
-    gh
     vscode
     vim
     neovim
     lf
     figlet
-    tree
-    fortune
     
-    # ===== NETWORK MANAGEMENT =====
+    # Network management
     networkmanagerapplet
     libnotify
     networkmanager
     
-    # ===== APPLICATION LAUNCHERS =====
+    # Application launchers
     rofi
     
-    # ===== APPLICATIONS =====
+    # Applications
     firefox
-    cider
+    cider  # Music player
     steam
-    gimp3-with-plugins
     
-    # ===== HYPRLAND ECOSYSTEM =====
-    wofi
-    waybar
-    swaynotificationcenter
-    hyprpaper
-    swaylock-effects
-    wlogout
-    grim
-    slurp
-    wl-clipboard
-    cliphist
+    # Hyprland-related
+    wofi  # App launcher
+    waybar  # Status bar
+    swaynotificationcenter  # For notifications
+    hyprpaper  # Wallpaper
     
-    # Add hyprwinwrap to system packages for PATH access
-    pkgs.hyprlandPlugins.hyprwinwrap
-    
-    # ===== SYSTEM UTILITIES =====
+    # Utils
     wget
     curl
     htop
     btop
     ripgrep
-    fd
-    bat
-    eza
-    fzf
-    jq
-    bc
-    
-    # ===== HARDWARE TOOLS =====
-    blueman
-    poweralertd
-    brightnessctl
+    blueman  # Bluetooth manager
+    power-profiles-daemon
+    poweralertd  # Battery notifications
     light
-    upower
-    acpi
-    lm_sensors
-    powertop
-    
-    # ===== FILE MANAGEMENT =====
+    swaylock-effects
+    libsForQt5.qt5.qtgraphicaleffects
+    libsForQt5.qt5.qtquickcontrols2
+    libsForQt5.qt5.qtsvg
+    busybox
     xfce.thunar
-    gnome-disk-utility
-    
-    # ===== MULTIMEDIA =====
-    vlc
-    pavucontrol
     wireplumber
-    geeqie
-    
-    # ===== PRODUCTIVITY =====
-    libreoffice
-    nextcloud-client
-    keepassxc
-    syncthing
-    font-manager
-    
-    # ===== COMMUNICATION =====
-    discord
-    element-desktop
-    
-    # ===== DEVELOPMENT =====
-    nodejs_20
-    nodePackages.npm
-    code-cursor
-    
-    # ===== GESTURE SUPPORT =====
-    libinput-gestures
-    wmctrl
-    xdotool
-    
-    # ===== ADDITIONAL UTILITIES =====
+    fzf
     speedtest-cli
     cointop
     micro
     slack-term
-    thefuck
     lolcat
     tuir
-    imagemagick
-    fastfetch
-    pipes
-    busybox
-    
-    # ===== CURSORS AND THEMES =====
-    apple-cursor
     bibata-cursors
-    gnome-themes-extra
-    papirus-icon-theme
+    kew
+    xdotool
+    nodejs_20
+    nodePackages.npm
+    code-cursor
+    claude-code
     
-    # Optional MATE applications
-    mate.caja              # File manager
-    mate.mate-terminal     # Terminal  
-    mate.mate-calc         # Calculator
-    mate.pluma             # Text editor
-    xorg.xdpyinfo
-    bc          # Calculator for DPI calculations
-    xorg.xrandr    # X RandR extension
-
-    # ===== AUTHENTICATION =====
+    # Power management
+    powertop
+    
+    # System tools
+    gnome-disk-utility
+    libinput-gestures
+    
+    # Productivity
+    libreoffice
+    nextcloud-client
+    
+    # Communication
+    discord
+    element-desktop
+    
+    # Media
+    vlc
+    
+    # Utilities
+    keepassxc
+    syncthing
+    font-manager
+    
+    # Screenshot tools
+    grim
+    slurp
+    
+    # Session management
+    wlogout
+    
+    # Authentication dialogs
     libsForQt5.polkit-kde-agent
     
-    # ===== WALLPAPER AND BACKGROUNDS =====
-    swaybg
+    # Additional utilities
+    swaybg  # For solid color backgrounds
+    imagemagick  # For image manipulation
+    neofetch
+    pipes
     
-    # ===== CUSTOM SCRIPTS =====
-
-  (writeShellScriptBin "code-mate-fixed" ''
-  #!/bin/bash
-  
-  # Parse zoom level from arguments (default to 8 for Framework 13 MATE)
-  ZOOM_LEVEL=8
-  ARGS=()
-  
-  while [[ $# -gt 0 ]]; do
-    case $1 in
-      --zoom-level=*)
-        ZOOM_LEVEL="''${1#*=}"
-        shift
-        ;;
-      --zoom-level)
-        ZOOM_LEVEL="$2"
-        shift 2
-        ;;
-      *)
-        ARGS+=("$1")
-        shift
-        ;;
-    esac
-  done
-  
-  echo "Setting up VS Code for Framework 13 in MATE (zoom: $ZOOM_LEVEL)..."
-  
-  # Completely clear Hyprland scaling variables
-  unset GDK_SCALE
-  unset GDK_DPI_SCALE  
-  unset QT_SCALE_FACTOR
-  unset QT_FONT_DPI
-  unset QT_AUTO_SCREEN_SCALE_FACTOR
-  unset WINIT_X11_SCALE_FACTOR
-  unset _JAVA_OPTIONS
-  
-  # Set standard scaling for MATE
-  export GDK_SCALE=1.0
-  export GDK_DPI_SCALE=1.0
-  export QT_SCALE_FACTOR=1.0
-  export QT_FONT_DPI=96
-  
-  # Launch VS Code with zoom level 8 (matches MATE app scaling)
-  exec ${pkgs.vscode}/bin/code \
-    --force-device-scale-factor=1.0 \
-    --zoom-level=$ZOOM_LEVEL \
-    --disable-features=UseOzonePlatform \
-    --ozone-platform=x11 \
-    "''${ARGS[@]}"
-'')
-
-    # Auto-start btop wallpaper script - simplified approach
-    (writeShellScriptBin "btop-wallpaper-autostart" ''
-      #!/bin/bash
-      # Auto-start btop wallpaper - simplified approach
-      
-      # Wait for Hyprland to fully load
-      sleep 5
-      
-      # Kill any existing btop wallpaper instances
-      ${pkgs.procps}/bin/pkill -f ".*btop.*wallpaper" 2>/dev/null || true
-      
-      # Wait for cleanup
-      sleep 2
-      
-      # Launch btop in floating terminal - let window rules handle wallpaper behavior
-      ${pkgs.hyprland}/bin/hyprctl dispatch exec "${pkgs.kitty}/bin/kitty --class btop-wallpaper -o font_size=11 -o background_opacity=0.8 -e ${pkgs.btop}/bin/btop"
-      
-      # Verify it started
-      sleep 3
-      if ${pkgs.procps}/bin/pgrep -f "kitty.*btop-wallpaper" >/dev/null; then
-        ${pkgs.libnotify}/bin/notify-send "Btop Monitor" "Started successfully" --timeout=3000
-        
-        # Apply wallpaper-like positioning
-        ${pkgs.hyprland}/bin/hyprctl dispatch movewindowpixel "exact 50 50,class:btop-wallpaper"
-        ${pkgs.hyprland}/bin/hyprctl dispatch resizewindowpixel "exact 700 500,class:btop-wallpaper"
-      else
-        ${pkgs.libnotify}/bin/notify-send "Btop Monitor" "Failed to start" --urgency=critical
-      fi
-    '')
+    # SDDM Theme - Sugar Dark as backup
+    (pkgs.fetchFromGitHub {
+      owner = "MarianArlt";
+      repo = "sddm-sugar-dark";
+      rev = "v1.2";
+      sha256 = "sha256-C3qB9hFUeuT5+Dos2zFj5SyQegnghpoFV9wHvE9VoD8=";
+    })
     
-    # Performance monitoring script
-    (writeShellScriptBin "hypr-performance" ''
-      #!/bin/bash
-      # Hyprland performance monitor for Framework 13
-      
-      echo "=== Hyprland Performance Monitor ==="
-      echo "Framework 13 AMD - $(${pkgs.coreutils}/bin/date)"
-      echo ""
-      
-      # System info
-      echo "System Information:"
-      echo "Kernel: $(${pkgs.coreutils}/bin/uname -r)"
-      echo "CPU: $(${pkgs.util-linux}/bin/lscpu | ${pkgs.gnugrep}/bin/grep 'Model name' | ${pkgs.coreutils}/bin/cut -d: -f2 | ${pkgs.findutils}/bin/xargs)"
-      echo "Memory: $(${pkgs.procps}/bin/free -h | ${pkgs.gawk}/bin/awk '/^Mem:/ {print $2}')"
-      echo ""
-      
-      # Hyprland info
-      echo "Hyprland Status:"
-      if ${pkgs.procps}/bin/pgrep -x Hyprland >/dev/null; then
-        echo "✅ Hyprland is running"
-      else
-        echo "❌ Hyprland is not running"
-      fi
-      echo ""
-      
-      # Plugin status
-      echo "Plugin Status:"
-      if command -v hyprctl >/dev/null 2>&1; then
-        ${pkgs.hyprland}/bin/hyprctl plugin list | ${pkgs.gnugrep}/bin/grep -E "(hyprspace|hyprwinwrap)" || echo "No plugins loaded"
-      else
-        echo "hyprctl not available"
-      fi
-      echo ""
-      
-      # Performance metrics
-      echo "Performance Metrics:"
-      load_avg=$(${pkgs.coreutils}/bin/uptime | ${pkgs.gawk}/bin/awk -F'load average:' '{print $2}' | ${pkgs.gawk}/bin/awk '{print $1}' | ${pkgs.gnused}/bin/sed 's/,//')
-      echo "Load average: $load_avg"
-      
-      mem_usage=$(${pkgs.procps}/bin/free | ${pkgs.gnugrep}/bin/grep Mem | ${pkgs.gawk}/bin/awk '{printf "%.0f", $3/$2 * 100.0}')
-      echo "Memory usage: ''${mem_usage}%"
-      
-      # Temperature
-      if command -v sensors >/dev/null 2>&1; then
-        cpu_temp=$(${pkgs.lm_sensors}/bin/sensors 2>/dev/null | ${pkgs.gnugrep}/bin/grep -E 'Tctl|CPU' | ${pkgs.gawk}/bin/awk '{print $2}' | ${pkgs.coreutils}/bin/head -1 || echo 'N/A')
-        echo "CPU temperature: $cpu_temp"
-      fi
-      echo ""
-      
-      # Recommendations
-      echo "Performance Analysis:"
-      if (( $(echo "$load_avg > 2.0" | ${pkgs.bc}/bin/bc -l 2>/dev/null || echo 0) )); then
-        echo "⚠️  High system load detected: $load_avg"
-      else
-        echo "✅ System load normal: $load_avg"
-      fi
-      
-      if [ "$mem_usage" -gt 80 ]; then
-        echo "⚠️  High memory usage: ''${mem_usage}%"
-      else
-        echo "✅ Memory usage normal: ''${mem_usage}%"
-      fi
+    # Power button script
+    (pkgs.writeShellScriptBin "power-menu" ''
+      wlogout
     '')
-    
-    # Gesture debug script
-    (writeShellScriptBin "gesture-debug" ''
-      #!/bin/bash
-      # Debug libinput gestures for Framework 13 touchpad
-      
-      echo "=== Framework 13 Gesture Debugger ==="
-      echo "This will monitor touchpad gestures. Press Ctrl+C to stop."
-      echo ""
-      
-      # Check libinput-gestures status
-      if ${pkgs.procps}/bin/pgrep -x "libinput-gestures" >/dev/null; then
-        echo "✅ libinput-gestures is running"
-      else
-        echo "❌ libinput-gestures is not running"
-        echo "Start with: libinput-gestures-setup start"
-      fi
-      echo ""
-      
-      # Check user groups
-      echo "User permissions:"
-      if ${pkgs.coreutils}/bin/groups | ${pkgs.gnugrep}/bin/grep -q input; then
-        echo "✅ User is in input group"
-      else
-        echo "❌ User not in input group. Run: sudo usermod -a -G input $USER"
-      fi
-      echo ""
-      
-      # Show gesture config
-      echo "Gesture configuration:"
-      if [ -f ~/.config/libinput-gestures.conf ]; then
-        echo "Config file exists:"
-        ${pkgs.gnugrep}/bin/grep -E "^gesture:" ~/.config/libinput-gestures.conf | ${pkgs.coreutils}/bin/head -5
-      else
-        echo "❌ No gesture configuration found at ~/.config/libinput-gestures.conf"
-      fi
-      echo ""
-      
-      # Monitor events
-      echo "Monitoring touchpad events (perform gestures to see output):"
-      if [ "$EUID" -eq 0 ]; then
-        ${pkgs.libinput}/bin/libinput debug-events | ${pkgs.gnugrep}/bin/grep -E "(GESTURE|POINTER_MOTION)" --line-buffered
-      else
-        echo "Note: Some events may require sudo access"
-        ${pkgs.libinput}/bin/libinput debug-events 2>/dev/null | ${pkgs.gnugrep}/bin/grep -E "(GESTURE|POINTER)" --line-buffered || {
-          echo "Cannot access input events. Try running with sudo or check permissions."
-        }
-      fi
-    '')
-    
-    # Power management scripts
-    (writeShellScriptBin "power-menu-battery" ''
-      #!/bin/bash
-      choice=$(echo -e "󰂄 Battery Status\n⚡ AC Profile\n🔋 Battery Profile\n⚙️ TLP Settings\n📊 Power Statistics\n🔧 Advanced TLP Config" | ${pkgs.wofi}/bin/wofi --dmenu --prompt "Power Management")
-      
-      case "$choice" in
-        "󰂄 Battery Status")
-          ${pkgs.kitty}/bin/kitty --class floating-terminal -e ${pkgs.bash}/bin/bash -c "
-            echo '=== Battery Information ==='
-            ${pkgs.upower}/bin/upower -i /org/freedesktop/UPower/devices/battery_BAT0
-            echo
-            echo '=== TLP Status ==='
-            sudo ${pkgs.tlp}/bin/tlp-stat -b
-            read -p 'Press Enter to close...'
-          "
-          ;;
-        "⚡ AC Profile")
-          sudo ${pkgs.tlp}/bin/tlp ac && ${pkgs.libnotify}/bin/notify-send "TLP" "Switched to AC profile (Performance mode)"
-          ;;
-        "🔋 Battery Profile") 
-          sudo ${pkgs.tlp}/bin/tlp bat && ${pkgs.libnotify}/bin/notify-send "TLP" "Switched to Battery profile (Power saving mode)"
-          ;;
-        "⚙️ TLP Settings")
-          ${pkgs.kitty}/bin/kitty --class floating-terminal -e ${pkgs.bash}/bin/bash -c "
-            echo '=== Current TLP Configuration ==='
-            sudo ${pkgs.tlp}/bin/tlp-stat -c
-            echo
-            read -p 'Press Enter to close...'
-          "
-          ;;
-        "📊 Power Statistics")
-          ${pkgs.kitty}/bin/kitty --class floating-terminal -e ${pkgs.bash}/bin/bash -c "
-            echo '=== Power Statistics ==='
-            sudo ${pkgs.tlp}/bin/tlp-stat -s
-            echo
-            echo '=== Temperature Sensors ==='
-            ${pkgs.lm_sensors}/bin/sensors
-            echo
-            read -p 'Press Enter to close...'
-          "
-          ;;
-        "🔧 Advanced TLP Config")
-          ''${EDITOR:-${pkgs.nano}/bin/nano} /etc/tlp.conf
-          ;;
-      esac
-    '')
-
-    (writeShellScriptBin "tlp-toggle-mode" ''
-      #!/bin/bash
-      if ${pkgs.acpi}/bin/acpi -a | ${pkgs.gnugrep}/bin/grep -q "on-line"; then
-        sudo ${pkgs.tlp}/bin/tlp bat
-        ${pkgs.libnotify}/bin/notify-send "TLP" "Forced Battery Profile (Power Saving)" -i battery-caution
-      else
-        sudo ${pkgs.tlp}/bin/tlp ac  
-        ${pkgs.libnotify}/bin/notify-send "TLP" "Forced AC Profile (Performance)" -i battery-full-charging
-      fi
-    '')
-    
-    # Waybar utility scripts
-    (writeShellScriptBin "waybar-weather" ''
-      #!/bin/bash
-      location="New+York"
-      weather=$(${pkgs.curl}/bin/curl -s "https://wttr.in/$location?format=1" 2>/dev/null | ${pkgs.coreutils}/bin/head -c -1)
-      if [ -z "$weather" ]; then
-        echo "󰼢 N/A"
-      else
-        echo "$weather"
-      fi
-    '')
-    
-    (writeShellScriptBin "waybar-system" ''
-      #!/bin/bash
-      case "$1" in
-        "cpu")
-          echo "CPU: $(${pkgs.coreutils}/bin/nproc) cores"
-          echo "Load: $(${pkgs.coreutils}/bin/uptime | ${pkgs.gawk}/bin/awk -F'load average:' '{print $2}')"
-          ;;
-        "memory")
-          ${pkgs.procps}/bin/free -h | ${pkgs.gawk}/bin/awk '/^Mem/ {printf "Used: %s/%s (%.1f%%)", $3, $2, $3/$2*100}'
-          ;;
-        *)
-          echo "Usage: waybar-system [cpu|memory]"
-          ;;
-      esac
-    '')
-    
-    # Power menu script
-    (writeShellScriptBin "power-menu" ''
-      ${pkgs.wlogout}/bin/wlogout
-    '')
-    
-    # Wofi performance benchmark script
-    (writeShellScriptBin "wofi-benchmark" ''
-      #!/bin/bash
-      echo "=== Wofi Performance Benchmark ==="
-      
-      # Clear cache for clean test
-      ${pkgs.coreutils}/bin/rm -f ~/.cache/wofi-*
-      
-      echo "Benchmarking Wofi startup time (5 runs)..."
-      total_time=0
-      for i in {1..5}; do
-        start_time=$(${pkgs.coreutils}/bin/date +%s.%N)
-        ${pkgs.coreutils}/bin/timeout 2 ${pkgs.wofi}/bin/wofi --show drun &
-        WOFI_PID=$!
-        sleep 0.5
-        ${pkgs.util-linux}/bin/kill $WOFI_PID 2>/dev/null
-        end_time=$(${pkgs.coreutils}/bin/date +%s.%N)
-        
-        run_time=$(echo "$end_time - $start_time" | ${pkgs.bc}/bin/bc)
-        echo "Run $i: ''${run_time}s"
-        total_time=$(echo "$total_time + $run_time" | ${pkgs.bc}/bin/bc)
-        
-        sleep 0.2
-      done
-      
-      avg_time=$(echo "scale=3; $total_time / 5" | ${pkgs.bc}/bin/bc)
-      echo "Average startup time: ''${avg_time}s"
-      
-      if (( $(echo "$avg_time > 0.3" | ${pkgs.bc}/bin/bc -l) )); then
-        echo "⚠️  Wofi startup is slow. Try optimizations in config."
-      else
-        echo "✅ Wofi performance is good!"
-      fi
-    '')
-    
-    # Hyprspace theme switcher
-    (writeShellScriptBin "hyprspace-theme" ''
-      #!/bin/bash
-      case "$1" in
-        "dracula")
-          ${pkgs.hyprland}/bin/hyprctl keyword plugin:hyprspace:overview_bg_color "rgba(40, 42, 54, 0.85)"
-          ${pkgs.hyprland}/bin/hyprctl keyword plugin:hyprspace:overview_border_color "rgba(189, 147, 249, 1)"
-          ${pkgs.hyprland}/bin/hyprctl keyword plugin:hyprspace:overview_border_inactive_color "rgba(68, 71, 90, 1)"
-          ${pkgs.libnotify}/bin/notify-send "Hyprspace" "Switched to Dracula theme"
-          ;;
-        "catppuccin")
-          ${pkgs.hyprland}/bin/hyprctl keyword plugin:hyprspace:overview_bg_color "rgba(30, 30, 46, 0.8)"
-          ${pkgs.hyprland}/bin/hyprctl keyword plugin:hyprspace:overview_border_color "rgba(137, 180, 250, 1)"
-          ${pkgs.hyprland}/bin/hyprctl keyword plugin:hyprspace:overview_border_inactive_color "rgba(88, 91, 112, 1)"
-          ${pkgs.libnotify}/bin/notify-send "Hyprspace" "Switched to Catppuccin theme"
-          ;;
-        "nord")
-          ${pkgs.hyprland}/bin/hyprctl keyword plugin:hyprspace:overview_bg_color "rgba(46, 52, 64, 0.8)"
-          ${pkgs.hyprland}/bin/hyprctl keyword plugin:hyprspace:overview_border_color "rgba(136, 192, 208, 1)"
-          ${pkgs.hyprland}/bin/hyprctl keyword plugin:hyprspace:overview_border_inactive_color "rgba(76, 86, 106, 1)"
-          ${pkgs.libnotify}/bin/notify-send "Hyprspace" "Switched to Nord theme"
-          ;;
-        *)
-          echo "Usage: hyprspace-theme [dracula|catppuccin|nord]"
-          ;;
-      esac
-    '')
-
-# Check DPI script
-    (writeShellScriptBin "check-dpi" ''
-  #!/bin/bash
-  echo "=== DPI Diagnostic Information ==="
-  echo "Date: $(date)"
-  echo "Desktop Environment: $XDG_CURRENT_DESKTOP"
-  echo ""
-  
-  echo "=== Environment Variables ==="
-  echo "GDK_SCALE: $GDK_SCALE"
-  echo "GDK_DPI_SCALE: $GDK_DPI_SCALE"
-  echo "QT_SCALE_FACTOR: $QT_SCALE_FACTOR"
-  echo "QT_FONT_DPI: $QT_FONT_DPI"
-  echo ""
-  
-  echo "=== X11 DPI Information ==="
-  if command -v xdpyinfo >/dev/null 2>&1; then
-    xdpyinfo | grep -E "dimensions|resolution"
-  else
-    echo "xdpyinfo not available"
-  fi
-  echo ""
-  
-  echo "=== MATE DPI Settings ==="
-  if command -v gsettings >/dev/null 2>&1; then
-    echo "MATE Interface scaling: $(gsettings get org.mate.interface scaling-factor 2>/dev/null || echo 'N/A')"
-    echo "MATE Font DPI: $(gsettings get org.mate.font-rendering dpi 2>/dev/null || echo 'N/A')"
-    echo "MATE Window scaling: $(gsettings get org.mate.Marco.general compositing-manager 2>/dev/null || echo 'N/A')"
-  else
-    echo "gsettings not available"
-  fi
-  echo ""
-  
-  echo "=== Calculated DPI ==="
-  if command -v xrandr >/dev/null 2>&1; then
-    # Get screen resolution and physical size
-    xrandr | grep -A1 "connected primary" | tail -1 | grep -o '[0-9]*x[0-9]*' | head -1
-    echo "Monitor info:"
-    xrandr | grep "connected primary"
-  else
-    echo "xrandr not available"
-  fi
-  echo ""
-  
-  echo "=== Font Configuration ==="
-  if command -v fc-match >/dev/null 2>&1; then
-    echo "Default font: $(fc-match sans-serif)"
-    echo "Monospace font: $(fc-match monospace)"
-  fi
-'')
   ];
 
-  # ===== XDG PORTAL CONFIGURATION =====
-  xdg.portal = {
-    enable = true;
-    extraPortals = with pkgs; [ 
-      xdg-desktop-portal-gtk
-    ];
-    config.common.default = "*";
-  };
-
-  # ===== SYSTEMD SERVICES =====
-  systemd.services = {
-    # Optimize journal for SSD
-    "systemd-journald" = {
-      serviceConfig = {
-        SystemMaxUse = "100M";
-        RuntimeMaxUse = "50M";
-      };
-    };
-  };
-
-  # ===== SYSTEM STATE VERSION =====
+  # Update stateVersion (keep your original value)
   system.stateVersion = "24.11";
 }
